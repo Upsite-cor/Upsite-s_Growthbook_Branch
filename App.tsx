@@ -6,6 +6,7 @@
  */
 
 import React from 'react';
+import { NavigationContainer } from '@react-navigation/native';
 import {
   SafeAreaView,
   Text,
@@ -14,9 +15,11 @@ import {
 
 function App(): JSX.Element {
   return (
-    <SafeAreaView>
+    <NavigationContainer>
+        <SafeAreaView>
       <Text>Growthbook</Text>
     </SafeAreaView>
+    </NavigationContainer>
   );
 }
 
