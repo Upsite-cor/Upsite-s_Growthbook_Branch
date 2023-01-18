@@ -11,13 +11,14 @@ import {
   SafeAreaView,
   Text,
 } from 'react-native';
+import { HomeScreen } from './screens/mainApp/HomeScreen';
 
 
 function App(): JSX.Element {
   return (
     <NavigationContainer>
         <SafeAreaView>
-      <Text>Growthbook</Text>
+        <HomeScreen></HomeScreen>
     </SafeAreaView>
     </NavigationContainer>
   );
