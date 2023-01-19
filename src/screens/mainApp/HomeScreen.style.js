@@ -2,7 +2,7 @@ import { StyleSheet } from "react-native";
 
 const homeScreenStylesheet = StyleSheet.create({
     logo:{
-        paddingTop:25
+        marginTop:10
     }
 });
 
