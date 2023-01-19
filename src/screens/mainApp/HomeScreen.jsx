@@ -29,6 +29,7 @@ export const HomeScreen = () => {
 
     const courses = [
         {
+            id:"1",
             coverArt: "https://firebasestorage.googleapis.com/v0/b/growthbook-ec77d.appspot.com/o/assets%2FcoverArts%2Fhd-wallpaper-3021072_640.jpg?alt=media&token=91a3e5b9-31be-40dd-aaf2-51f224a6f45b",
             title: "Start Your Own Travel Busines",
             authorName: "Mike Russel",
@@ -38,6 +39,7 @@ export const HomeScreen = () => {
             }
         },
         {
+            id:"2",
             coverArt: "https://firebasestorage.googleapis.com/v0/b/growthbook-ec77d.appspot.com/o/assets%2FcoverArts%2Fhd-wallpaper-3021072_640.jpg?alt=media&token=91a3e5b9-31be-40dd-aaf2-51f224a6f45b",
             title: "Start Your Own Travel Busines",
             authorName: "Mike Russel",
