@@ -10,6 +10,7 @@ import ActionHeader from '../../components/layout/actionHeader/ActionHeader.comp
 import SearchButton from '../../components/home/searchButton/SearchButton.component';
 import CourseCard from '../../components/home/courseCard/CourseCard.component';
 import CourseList from '../../components/home/courseList/CourseList.component';
+import Icon from 'react-native-vector-icons/FontAwesome5';
 
 export const HomeScreen = () => {
 
@@ -62,6 +63,9 @@ export const HomeScreen = () => {
             <ActionHeader heading={"Latest Courses"}/>
             <ActionHeader heading={"Popular Courses"}/>
             <CourseList courses={courses}/>
+            <Icon.Button name="facebook" solid>
+    Login with Facebook
+  </Icon.Button>
         </Container>
     );
 };
