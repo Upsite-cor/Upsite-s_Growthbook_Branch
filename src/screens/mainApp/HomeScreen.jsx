@@ -35,18 +35,28 @@ export const HomeScreen = () => {
             title: "Start Your Own Travel Busines",
             authorName: "Mike Russel",
             rating:{
-                average: 4.5,
+                average: 3,
                 count: 10009
             }
         },
         {
             id:"2",
-            coverArt: "https://firebasestorage.googleapis.com/v0/b/growthbook-ec77d.appspot.com/o/assets%2FcoverArts%2Fhd-wallpaper-3021072_640.jpg?alt=media&token=91a3e5b9-31be-40dd-aaf2-51f224a6f45b",
-            title: "Start Your Own Travel Busines",
-            authorName: "Mike Russel",
+            coverArt: "https://firebasestorage.googleapis.com/v0/b/growthbook-ec77d.appspot.com/o/assets%2FcoverArts%2Famerica-3125467_640.jpg?alt=media&token=da53b135-ba32-4a01-bba1-c7668b24d4e7",
+            title: "How to Budget and Forecast for Your Business",
+            authorName: "UCLA Business School of Studies",
             rating:{
                 average: 4.5,
-                count: 10009
+                count: 231
+            }
+        },
+        {
+            id:"3",
+            coverArt: "https://firebasestorage.googleapis.com/v0/b/growthbook-ec77d.appspot.com/o/assets%2FcoverArts%2Fchess-4794265_640.jpg?alt=media&token=f58745ea-948b-4e5b-b358-c8e5d1768770",
+            title: "Leadership: Practical Leadership Skills",
+            authorName: "David Ochi",
+            rating:{
+                average: 5,
+                count: 243
             }
         }
     ] 
@@ -61,11 +71,9 @@ export const HomeScreen = () => {
             <ActionHeader heading={"Categories"}/>
             <CategoryBox categories={pills}/>
             <ActionHeader heading={"Latest Courses"}/>
-            <ActionHeader heading={"Popular Courses"}/>
             <CourseList courses={courses}/>
-            <Icon.Button name="facebook" solid>
-    Login with Facebook
-  </Icon.Button>
+            <ActionHeader heading={"Popular Courses"}/>
+            <CourseList courses={[...courses.slice().reverse()]}/>
         </Container>
     );
 };

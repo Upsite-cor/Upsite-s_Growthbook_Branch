@@ -12,9 +12,16 @@ export const colors = {
         PRIMARY: '#1F1F1F',
         SECONDARY: "#FFF",
         BRAND: "#128AAE",
-        DARK: "#808080"
+        DARK: "#808080",
+        GOLDEN: "#B4690E"
     },
     general:{
-        BACKGROUND: "#EEEEEE"
+        BACKGROUND: "#EEEEEE",
+
+    },
+    rating: {
+        FULL_STAR: "#E59819",
+        HALF_STAR:"#FFCB45",
+        EMPTY_STAR: "#F2F2F2"
     }
 }

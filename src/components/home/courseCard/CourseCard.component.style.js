@@ -28,6 +28,33 @@ const CourseCardStylesheet= StyleSheet.create({
         fontSize: 14,
         color: colors.font.DARK,
         marginTop: 5
+    },
+    ratingContainer:{
+        flexDirection:"row",
+        alignItems:"center",
+        marginTop:5,
+        gap:2
+    },
+    ratingAverageText:{
+        fontFamily: typography.fontFamilies.PRIMARY,
+        fontWeight: "700",
+        fontSize: 14,
+        color: colors.font.GOLDEN,
+    },
+    ratingCount:{
+        fontFamily: typography.fontFamilies.PRIMARY,
+        fontWeight: "400",
+        fontSize: 14,
+        color: colors.font.DARK,
+    },
+    activityLoader:{
+        position: 'absolute',
+        top: 0,
+        bottom: 0,
+        left: 0,
+        right: 0,
+        alignItems: 'center',
+        justifyContent: 'center',
     }
 })
 
