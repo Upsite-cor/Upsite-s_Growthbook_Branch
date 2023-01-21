@@ -8,9 +8,8 @@ import Container from '../../components/layout/container/Container.component';
 import CategoryBox from '../../components/home/categoryList/CategoryList.component';
 import ActionHeader from '../../components/layout/actionHeader/ActionHeader.component';
 import SearchButton from '../../components/home/searchButton/SearchButton.component';
-import CourseCard from '../../components/home/courseCard/CourseCard.component';
 import CourseList from '../../components/home/courseList/CourseList.component';
-import Icon from 'react-native-vector-icons/FontAwesome5';
+import MarketingSlideContainer from '../../components/home/marketingSlideContainer/MarketingSlideContainer.component';
 
 export const HomeScreen = () => {
 
@@ -68,6 +67,7 @@ export const HomeScreen = () => {
             </View>
             <Text style={globalStylesheet.heading}>Explore</Text>
             <SearchButton/>
+            <MarketingSlideContainer />
             <ActionHeader heading={"Categories"}/>
             <CategoryBox categories={pills}/>
             <ActionHeader heading={"Latest Courses"}/>
