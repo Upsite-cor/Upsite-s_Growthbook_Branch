@@ -17,9 +17,7 @@ import { HomeScreen } from './screens/mainApp/HomeScreen';
 function App(): JSX.Element {
   return (
     <NavigationContainer>
-        <SafeAreaView>
-        <HomeScreen></HomeScreen>
-    </SafeAreaView>
+    <HomeScreen />
     </NavigationContainer>
   );
 }
