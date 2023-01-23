@@ -17,6 +17,8 @@ export const colors = {
     },
     general:{
         BACKGROUND: "#EEEEEE",
+        BRAND: "#128AAE",
+        WHITE: "#fff"
 
     },
     rating: {
