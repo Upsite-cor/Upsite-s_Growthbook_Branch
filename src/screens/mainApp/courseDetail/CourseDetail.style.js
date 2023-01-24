@@ -7,9 +7,10 @@ const CourseDetailStylesheet = StyleSheet.create({
     fontWeight: '700',
     fontSize: 24,
     color: colors.font.PRIMARY,
+    marginTop:15
   },
   courseTitle: {
-    marginTop: 20,
+    marginTop: 15,
     fontFamily: typography.fontFamilies.PRIMARY,
     fontWeight: '700',
     fontSize: 32,
@@ -22,7 +23,7 @@ const CourseDetailStylesheet = StyleSheet.create({
     top: -42,
   },
   tabSeperator:{
-    marginTop:20
+    marginTop:15
   },
   contentSectionTitle:{
     fontFamily: typography.fontFamilies.PRIMARY,

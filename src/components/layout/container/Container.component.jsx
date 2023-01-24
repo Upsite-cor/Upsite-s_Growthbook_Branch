@@ -31,7 +31,7 @@ const Container = ({children, useDefaultSafeArea = true, edges= ["top", "bottom"
       )}
       {!useDefaultSafeArea && (
         <SafeAreaProvider>
-          <SafeAreaView  style={{flex: 1, backgroundColor:"yellow"}} edges={edges}>
+          <SafeAreaView  style={{flex: 1}} edges={edges}>
           {renderBody({children, isScrollable})}
           </SafeAreaView>
         </SafeAreaProvider>

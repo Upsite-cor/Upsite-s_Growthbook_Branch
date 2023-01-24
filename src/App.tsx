@@ -7,7 +7,7 @@
 
 import React from 'react';
 import {NavigationContainer} from '@react-navigation/native';
-import CourseDetail from './screens/mainApp/courseDetail/CourseDetail';
+import CourseDetailv2 from './screens/mainApp/courseDetail/CourseDetailv2';
 import Collapsible from './screens/mainApp/collapsible/Collapsible';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 
@@ -66,54 +66,54 @@ const App = () => {
           }
         ]
       },
-      // {
-      //   id: "5",
-      //   title: "Chapter 1",
-      //   child: [
-      //     {
-      //       id: "6",
-      //       title: "Case Short Advanced",
-      //       type: "audio",
-      //       contentId: "1342"
-      //     },
-      //     {
-      //       id: "7",
-      //       title: "Learning Material",
-      //       type: "material",
-      //       contentId: "233222"
-      //     },
-      //     {
-      //       id: "8",
-      //       title: "Quiz Last",
-      //       type: "quiz",
-      //       contentId: "234053"
-      //     }
-      //   ]
-      // },
-      // {
-      //   id: "9",
-      //   title: "Chapter 2",
-      //   child: [
-      //     {
-      //       id: "10",
-      //       title: "Case Short Advanced",
-      //       type: "audio",
-      //       contentId: "1342"
-      //     },
-      //     {
-      //       id: "11",
-      //       title: "Learning Material",
-      //       type: "material",
-      //       contentId: "233222"
-      //     },
-      //     {
-      //       id: "12",
-      //       title: "Quiz Last",
-      //       type: "quiz",
-      //       contentId: "234053"
-      //     }
-      //   ]
-      // }
+      {
+        id: "5",
+        title: "Chapter 1",
+        child: [
+          {
+            id: "6",
+            title: "Case Short Advanced",
+            type: "audio",
+            contentId: "1342"
+          },
+          {
+            id: "7",
+            title: "Learning Material",
+            type: "material",
+            contentId: "233222"
+          },
+          {
+            id: "8",
+            title: "Quiz Last",
+            type: "quiz",
+            contentId: "234053"
+          }
+        ]
+      },
+      {
+        id: "9",
+        title: "Chapter 2",
+        child: [
+          {
+            id: "10",
+            title: "Case Short Advanced",
+            type: "audio",
+            contentId: "1342"
+          },
+          {
+            id: "11",
+            title: "Learning Material",
+            type: "material",
+            contentId: "233222"
+          },
+          {
+            id: "12",
+            title: "Quiz Last",
+            type: "quiz",
+            contentId: "234053"
+          }
+        ]
+      }
     ]
 };
 
@@ -121,7 +121,7 @@ const App = () => {
   return (
     <SafeAreaProvider>
       <NavigationContainer>
-     <Collapsible></Collapsible>
+      <CourseDetailv2 course={course}></CourseDetailv2>
     </NavigationContainer>
     </SafeAreaProvider>
   );
