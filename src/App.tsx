@@ -8,7 +8,6 @@
 import React from 'react';
 import {NavigationContainer} from '@react-navigation/native';
 import CourseDetailv2 from './screens/mainApp/courseDetail/CourseDetailv2';
-import Collapsible from './screens/mainApp/collapsible/Collapsible';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 
 const App = () => {

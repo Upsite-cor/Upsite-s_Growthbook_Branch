@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "508881959069",
+    "project_id": "growthbook-ec77d",
+    "storage_bucket": "growthbook-ec77d.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:508881959069:android:efc2795dbdcf08a8e87c74",
+        "android_client_info": {
+          "package_name": "com.growthbook"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "508881959069-ss3m032r045hc8dd08ahq9ir8qehfagn.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBsD5fvbYT4Rpl2zcXrGVT1GOdooqW2EjY"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "508881959069-ss3m032r045hc8dd08ahq9ir8qehfagn.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
