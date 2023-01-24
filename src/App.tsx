@@ -9,9 +9,21 @@ import React from 'react';
 import {NavigationContainer} from '@react-navigation/native';
 import CourseDetailv2 from './screens/mainApp/courseDetail/CourseDetailv2';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
+import { ActivityIndicator, View } from 'react-native';
+import { colors } from './styles/theme.style';
+import { useState, useEffect,createContext } from 'react';
+import Login from './screens/auth/Login';
+import LoginWithEmail from './screens/auth/LoginEmail';
+import auth, {FirebaseAuthTypes} from '@react-native-firebase/auth';
+
+type User = FirebaseAuthTypes.User | null;
+export const UserContext = createContext<User>(null);
 
 const App = () => {
-
+  const [showLoader, setLoader] = useState(true);
+  const [initializing, setInitializing] = useState(true);
+  const [listenUser, setListenUser] = useState(false);
+  const [user, setUser] = useState<User>(null);
   const course =  {
     id:"1",
     coverArt: "https://firebasestorage.googleapis.com/v0/b/growthbook-ec77d.appspot.com/o/assets%2FcoverArts%2Fhd-wallpaper-3021072_640.jpg?alt=media&token=91a3e5b9-31be-40dd-aaf2-51f224a6f45b",
@@ -116,11 +128,35 @@ const App = () => {
     ]
 };
 
+useEffect(() => {
+  const authListener = auth().onAuthStateChanged(result => {
+    setUser(result);
+    if (initializing && !listenUser) {
+      setInitializing(false);
+      setLoader(false);
+      setListenUser(true);
+    }
+  });
+
+  return () => {
+    if (authListener) {
+      authListener();
+    }
+  };
+}, [initializing, listenUser]);
 
   return (
     <SafeAreaProvider>
       <NavigationContainer>
-      <CourseDetailv2 course={course}></CourseDetailv2>
+      { showLoader && <View style={{position:"absolute", 
+      backgroundColor: "white",
+       zIndex:9999,
+       width:"100%",
+       justifyContent:"center",
+       height:"100%",}}>
+      <ActivityIndicator color={colors.general.BRAND}></ActivityIndicator>
+      </View>}
+      <LoginWithEmail></LoginWithEmail>
     </NavigationContainer>
     </SafeAreaProvider>
   );

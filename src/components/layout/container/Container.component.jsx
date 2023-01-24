@@ -25,7 +25,7 @@ const Container = ({children, useDefaultSafeArea = true, edges= ["top", "bottom"
   return (
     <>
       {useDefaultSafeArea && (
-        <NativeSafeAreaView>
+        <NativeSafeAreaView style={{flex: 1, position:"relative"}}>
           {renderBody({children, isScrollable})}
         </NativeSafeAreaView>
       )}
