@@ -31,6 +31,15 @@ const DEFAULT_TITLE_COLOR = 'white';
 const CourseDetailv2 = ({course}) => {
   const insets = useSafeAreaInsets();
 
+  navBarActions = () => {
+    return (
+      <View style={[styles.headerButtonContainer, {marginTop: insets.top}]}>
+         <HeaderButton icon={'chevron-back'} />
+          <HeaderButton icon={'heart-outline'} />
+      </View>
+    )
+  }
+
   const containerStyle =null;
   const scrollViewStyle =null;
   const alwaysShowNavBar = true;
@@ -58,14 +67,6 @@ const CourseDetailv2 = ({course}) => {
     return [-getExtraScrollHeight(), 0, this.getHeaderScrollDistance()];
   }
 
-  navBarActions = () => {
-    return (
-      <View style={[styles.headerButtonContainer, {marginTop: insets.top}]}>
-         <HeaderButton icon={'chevron-back'} />
-          <HeaderButton icon={'heart-outline'} />
-      </View>
-    )
-  }
 
   getHeaderHeight =()=> {
     return scrollY.interpolate({
