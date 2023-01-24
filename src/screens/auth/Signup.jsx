@@ -9,18 +9,26 @@ import { Header,TermOfService } from './Login';
 import { Formik } from 'formik';
 import Field from '../../components/form/Field.component';
 
-const LoginWithEmail = () => {
+const Signup = () => {
   return (
     <View style={{flex: 1}}>
       <Container>
-        <Header title={"Login to your account."}></Header>
+        <Header title={"Create new account"}></Header>
         <View style={{gap: 15, marginTop: 55}}>
         <Formik
-            initialValues={{ email: '', password: '' }}
+            initialValues={{ fullName: '', email: '', password: '' }}
             onSubmit={values => console.log(values)}
           >
             {({ handleChange, handleBlur, handleSubmit, values }) => (
               <>
+               <Field
+                  name="fullName"
+                  placeholder="Full Name"
+                  style={styles.textInput}
+                  onChangeText={handleChange('fullName')}
+                  onBlur={handleBlur('fullName')}
+                  value={values.fullName}
+                />
                <Field
                   type="email"
                   name="email"
@@ -40,14 +48,13 @@ const LoginWithEmail = () => {
                   value={values.password}
                   secureTextEntry
                 />
-                <Button innerStyle={styles.forgot} type="outline" title="Forgot your password?" />
                 </View>
-                <Button onPress={handleSubmit} title="Login" />
+                <Button onPress={handleSubmit} title="Create New Account" />
               </>
             )}
           </Formik>
         </View>
-        <Button style={{marginTop: 15}} title={"New to Growthboook? Create Account"} type={"outline"}/>
+        <Button style={{marginTop: 15}} title={"Already have an account? Click here to login"} type={"outline"}/>
       </Container>
       <TermOfService />
     </View>
@@ -97,4 +104,4 @@ const styles = StyleSheet.create({
   }
 });
 
-export default LoginWithEmail;
+export default Signup;

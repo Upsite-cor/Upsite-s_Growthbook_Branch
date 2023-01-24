@@ -15,6 +15,7 @@ import { useState, useEffect,createContext } from 'react';
 import Login from './screens/auth/Login';
 import LoginWithEmail from './screens/auth/LoginEmail';
 import auth, {FirebaseAuthTypes} from '@react-native-firebase/auth';
+import Signup from './screens/auth/Signup';
 
 type User = FirebaseAuthTypes.User | null;
 export const UserContext = createContext<User>(null);
@@ -156,7 +157,7 @@ useEffect(() => {
        height:"100%",}}>
       <ActivityIndicator color={colors.general.BRAND}></ActivityIndicator>
       </View>}
-      <LoginWithEmail></LoginWithEmail>
+      <Signup />
     </NavigationContainer>
     </SafeAreaProvider>
   );

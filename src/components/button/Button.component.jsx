@@ -2,17 +2,24 @@ import React from 'react';
 import {TouchableOpacity, Text, StyleSheet, View} from 'react-native';
 import {colors, typography} from '../../styles/theme.style';
 
-const Button = ({title, type = 'default', style = null}) => {
+const Button = ({title, type = 'default', style = null, innerStyle =null,textStyle = null}) => {
+
+  const getText = ()=>{
+    return (
+      <Text style={[type=="default"? styles.text: styles.textOutline, textStyle]}>{title}</Text>
+    )
+  }
+  const styleProps = type=="default"? {...styles.container, ...innerStyle}: {...styles.containerOutline, ...innerStyle}
   return (
     <View style={style}>
       {type == 'default' && (
-        <TouchableOpacity style={styles.container}>
-          <Text style={styles.text}>{title}</Text>
+        <TouchableOpacity style={styleProps}>
+        {getText()}
         </TouchableOpacity>
       )}
-       {type == 'outline' && (
-        <TouchableOpacity style={styles.containerOutline}>
-          <Text style={styles.textOutline}>{title}</Text>
+      {type == 'outline' && (
+        <TouchableOpacity style={styleProps}>
+        {getText()}
         </TouchableOpacity>
       )}
     </View>
