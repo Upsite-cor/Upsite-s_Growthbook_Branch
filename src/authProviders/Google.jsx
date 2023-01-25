@@ -2,9 +2,9 @@ import { GoogleSignin,statusCodes } from '@react-native-google-signin/google-sig
 import React, { useContext, useEffect,useState } from 'react'
 import { Alert } from 'react-native';
 import auth from '@react-native-firebase/auth';
-import { UserContext } from '../App';
 import SocialLoginProvider from '../components/authProviders/SocialLoginProvider';
 import { errorMessages } from '../constants/errorCode';
+import { UserContext } from '../navigators/Application';
 
 
 const PROVIDER_ID = 'google.com';

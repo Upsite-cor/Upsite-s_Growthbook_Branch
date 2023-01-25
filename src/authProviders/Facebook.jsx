@@ -1,10 +1,10 @@
 import React, { useContext, useState } from 'react'
 import { Alert } from 'react-native';
-import { UserContext } from '../App';
 import SocialLoginProvider from '../components/authProviders/SocialLoginProvider';
 import auth from '@react-native-firebase/auth';
 import {AccessToken, LoginManager} from 'react-native-fbsdk-next';
 import { errorMessages } from '../constants/errorCode';
+import { UserContext } from '../navigators/Application';
 
 const PROVIDER_ID = 'facebook.com';
 

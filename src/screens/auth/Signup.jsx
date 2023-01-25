@@ -1,15 +1,39 @@
-import React, {useState} from 'react';
-import {Image, View, Text, TextInput, StyleSheet, TouchableOpacity} from 'react-native';
+import React from 'react';
+import {View, StyleSheet, Alert} from 'react-native';
 import Container from '../../components/layout/container/Container.component';
-import Logo from '../../assets/images/growthbookLogo-2.png';
-import Icon from 'react-native-vector-icons/FontAwesome';
-import {colors, typography} from '../../styles/theme.style';
+import {typography} from '../../styles/theme.style';
 import Button from '../../components/button/Button.component';
 import { Header,TermOfService } from './Login';
 import { Formik } from 'formik';
 import Field from '../../components/form/Field.component';
+import { useDispatch } from 'react-redux';
+import { hideLoader, showLoader } from '../../features/loader/loaderSlice';
+import { errorMessages } from '../../constants/errorCode';
+import auth from '@react-native-firebase/auth';
 
 const Signup = ({navigation}) => {
+  const dispatch = useDispatch();
+
+  const handleCreate = async (values) => {
+    try {
+      dispatch(showLoader());
+      const credential = await auth().createUserWithEmailAndPassword(
+        values.email,
+        values.password,
+      );
+      credential.user.updateProfile({displayName: values.fullName});
+      // credential.user.sendEmailVerification();
+      dispatch(hideLoader());
+    } catch (e) {
+      dispatch(hideLoader());
+      const error = e;
+      console.log(e);
+      Alert.alert(
+        errorMessages["createAccountError"],
+        errorMessages[error.code ?? 'unknownError']
+      );
+    }
+  };
   return (
     <View style={{flex: 1}}>
       <Container>
@@ -17,7 +41,7 @@ const Signup = ({navigation}) => {
         <View style={{gap: 15, marginTop: 55}}>
         <Formik
             initialValues={{ fullName: '', email: '', password: '' }}
-            onSubmit={values => console.log(values)}
+            onSubmit={handleCreate}
           >
             {({ handleChange, handleBlur, handleSubmit, values }) => (
               <>

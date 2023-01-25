@@ -5,23 +5,20 @@
  * @format
  */
 
-import auth, { FirebaseAuthTypes } from '@react-native-firebase/auth';
+
 import { DefaultTheme, NavigationContainer } from '@react-navigation/native';
 import React, { createContext, useEffect, useState } from 'react';
 import { ActivityIndicator, Text, View } from 'react-native';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
+import { Provider, useSelector } from 'react-redux';
 import Button from './components/button/Button.component';
 import SignedOutStack from './navigators/SignedOutStack';
+import { store } from './app/store';
 import { colors } from './styles/theme.style';
-
-type User = FirebaseAuthTypes.User | null;
-export const UserContext = createContext<User>(null);
+import ApplicationNavigator from './navigators/Application';
 
 const App = () => {
-  const [showLoader, setLoader] = useState(true);
-  const [initializing, setInitializing] = useState(true);
-  const [listenUser, setListenUser] = useState(false);
-  const [user, setUser] = useState<User>(null);
+ 
   const course =  {
     id:"1",
     coverArt: "https://firebasestorage.googleapis.com/v0/b/growthbook-ec77d.appspot.com/o/assets%2FcoverArts%2Fhd-wallpaper-3021072_640.jpg?alt=media&token=91a3e5b9-31be-40dd-aaf2-51f224a6f45b",
@@ -125,76 +122,13 @@ const App = () => {
       }
     ]
 };
-const MyTheme = {
-  ...DefaultTheme,
-  colors: {
-    ...DefaultTheme.colors,
-    background: '#fff',
-  },
-};
-
-useEffect(() => {
-  const authListener = auth().onAuthStateChanged(result => {
-    setUser(result);
-    if (initializing && !listenUser) {
-      setInitializing(false);
-      setLoader(false);
-      setListenUser(true);
-    }
-  });
-  return () => {
-    if (authListener) {
-      authListener();
-    }
-  };
-}, [initializing, listenUser]);
-
-  /** Listen for user changes */
-  useEffect(() => {
-    let userListener: () => void;
-
-    if (listenUser) {
-      // TODO @react-native-firebase/auth provides `onUserChanged` which is this and more.
-      // what else can we add and still be web-compatible?
-      userListener = auth().onIdTokenChanged(result => {
-        setUser(result);
-      });
-    }
-
-    return () => {
-      if (userListener) {
-        userListener();
-      }
-    };
-  }, [listenUser]);
-
 
   return (
-    <SafeAreaProvider>
-      <NavigationContainer theme={MyTheme}>
-      { showLoader && <View style={{position:"absolute", 
-      backgroundColor: "white",
-       zIndex:9999,
-       width:"100%",
-       justifyContent:"center",
-       height:"100%",}}>
-      <ActivityIndicator color={colors.general.BRAND}></ActivityIndicator>
-      </View>}
-      { user ? (
-         <UserContext.Provider value={user}>
-       <>
-       <Text>Logged in</Text>
-         <Button title="logout" onPress={()=> auth()
-  .signOut()
-  .then(() => console.log('User signed out!'))}></Button>
-       </>
-       </UserContext.Provider>
-      ) : (
-        <SignedOutStack />
-      )
-    }
-    </NavigationContainer>
+    <Provider store={store}>
+       <SafeAreaProvider>
+      <ApplicationNavigator></ApplicationNavigator>
     </SafeAreaProvider>
+    </Provider>
   );
 };
 

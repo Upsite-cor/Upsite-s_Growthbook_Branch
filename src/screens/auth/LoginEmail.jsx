@@ -10,10 +10,12 @@ import { Formik } from 'formik';
 import auth from '@react-native-firebase/auth';
 import Field from '../../components/form/Field.component';
 import { errorMessages } from '../../constants/errorCode';
+import { useDispatch } from 'react-redux';
+import { hideLoader, showLoader } from '../../features/loader/loaderSlice';
 
 
 const LoginWithEmail = ({navigation}) => {
-  const [loading, setLoading] = useState(false);
+  const dispatch = useDispatch();
 
   const handleLogin = async (values) => {
     if (!values?.email || !values?.password) {
@@ -21,10 +23,12 @@ const LoginWithEmail = ({navigation}) => {
     }
 
     try {
-      setLoading(true);
-      await auth().signInWithEmailAndPassword(values?.email, values?.password);
+      dispatch(showLoader());
+      await auth().signInWithEmailAndPassword(values?.email, values?.password).then(()=>{
+        dispatch(hideLoader());
+      });
     } catch (e) {
-      setLoading(false);
+      dispatch(hideLoader());
       console.log(e);
       const error = e;
       Alert.alert(
