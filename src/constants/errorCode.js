@@ -102,6 +102,7 @@ export const errorMessages = {
     // 'auth/account-exists-with-different-credential': "An account already exists with the same email address but different sign-in credentials. Sign in using a provider associated with this email address.",
     'invalid-session': 'Invalid Session',
     'invalid-session-message': 'Your session is invalid, please login again',
+    "auth/account-exists-with-different-credential": "Sign in using a provider associated with this email",
     'registration-error': 'Registration Error',
     'user-created': 'User Registered',
     'user-created-message': 'New user account registered successfully',

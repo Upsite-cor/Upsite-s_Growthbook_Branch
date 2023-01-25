@@ -29,7 +29,6 @@ const ApplicationNavigator = () => {
     const authListener = auth().onAuthStateChanged(result => {
       setUser(result);
       if (initializing && !listenUser) {
-        console.log("initlaizeeedd");
         setInitializing(false);
         dispatch(hideLoader())
         setListenUser(true);

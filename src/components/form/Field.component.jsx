@@ -1,5 +1,7 @@
 import React from 'react';
 import { StyleSheet, TextInput } from 'react-native';
+import { View, Text } from 'react-native';
+import { typography } from '../../styles/theme.style';
 
 const defaultProps = {
   placeholder: "Enter text here...",
@@ -30,14 +32,17 @@ const propTypes = {
 };
 
 const Field = (props) => {
-  const { type,style, ...otherProps } = props;
+  const { type,error,style, ...otherProps } = props;
   let propsToUse = { ...defaultProps };
   let styleProps = {...styles.container, ...style}
   if (type) {
     propsToUse = {...propsToUse, ...propTypes[type]};
   }
   return (
-    <TextInput style={styleProps} {...propsToUse} {...otherProps} />
+    <View>
+      <TextInput style={styleProps} {...propsToUse} {...otherProps} />
+      {error && <Text style={styles.errorText}>{error}</Text>}
+    </View>
   );
 };
 
@@ -49,6 +54,12 @@ const styles = StyleSheet.create({
         borderColor: '#808080',
         borderWidth: StyleSheet.hairlineWidth,
         borderRadius: 10,
+    },
+    errorText:{
+      fontFamily: typography.fontFamilies.PRIMARY,
+      color: "red",
+      fontWeight:"400",
+      fontSize:12
     }
 });
 export default Field;
