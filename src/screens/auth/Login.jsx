@@ -103,10 +103,11 @@ const Login = ({navigation}) => {
         </View>
         <LineBreak />
         <Button
-          onPress={() => navigation.navigate('loginEmail')}
+          onPress={() => navigation.replace('loginEmail')}
           title={'Login with Email'}
         />
         <Button
+        onPress={() => navigation.replace('signUp')}
           style={{marginTop: 15}}
           title={'New to Growthboook? Create Account'}
           type={'outline'}

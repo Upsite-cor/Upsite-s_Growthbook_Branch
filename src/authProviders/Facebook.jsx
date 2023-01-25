@@ -14,13 +14,13 @@ const Facebook = () => {
     const handleLogin = async () =>{
         if (!loading) {
             setLoading(true);
-        }
         try{
           const {isCancelled} = await LoginManager.logInWithPermissions([
             'public_profile',
             'email',
           ]);
           if (isCancelled) {
+            setLoading(false);
             Alert.alert("Facebook Auth Error", "Facebook authentication cancelled.");
           }else{
             const result = await AccessToken.getCurrentAccessToken();
@@ -41,6 +41,7 @@ const Facebook = () => {
             (error).message
           );
         }
+      }
     };
   return (
     <SocialLoginProvider

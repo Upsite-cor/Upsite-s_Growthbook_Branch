@@ -9,7 +9,7 @@ import { Header,TermOfService } from './Login';
 import { Formik } from 'formik';
 import Field from '../../components/form/Field.component';
 
-const Signup = () => {
+const Signup = ({navigation}) => {
   return (
     <View style={{flex: 1}}>
       <Container>
@@ -54,7 +54,7 @@ const Signup = () => {
             )}
           </Formik>
         </View>
-        <Button style={{marginTop: 15}} title={"Already have an account? Click here to login"} type={"outline"}/>
+        <Button onPress={() => navigation.replace('login')}  style={{marginTop: 15}} title={"Already have an account? Click here to login"} type={"outline"}/>
       </Container>
       <TermOfService />
     </View>

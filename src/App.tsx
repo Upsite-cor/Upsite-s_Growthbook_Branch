@@ -6,10 +6,11 @@
  */
 
 import auth, { FirebaseAuthTypes } from '@react-native-firebase/auth';
-import { NavigationContainer } from '@react-navigation/native';
+import { DefaultTheme, NavigationContainer } from '@react-navigation/native';
 import React, { createContext, useEffect, useState } from 'react';
 import { ActivityIndicator, Text, View } from 'react-native';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
+import Button from './components/button/Button.component';
 import SignedOutStack from './navigators/SignedOutStack';
 import { colors } from './styles/theme.style';
 
@@ -124,6 +125,13 @@ const App = () => {
       }
     ]
 };
+const MyTheme = {
+  ...DefaultTheme,
+  colors: {
+    ...DefaultTheme.colors,
+    background: '#fff',
+  },
+};
 
 useEffect(() => {
   const authListener = auth().onAuthStateChanged(result => {
@@ -163,7 +171,7 @@ useEffect(() => {
 
   return (
     <SafeAreaProvider>
-      <NavigationContainer>
+      <NavigationContainer theme={MyTheme}>
       { showLoader && <View style={{position:"absolute", 
       backgroundColor: "white",
        zIndex:9999,
@@ -174,7 +182,12 @@ useEffect(() => {
       </View>}
       { user ? (
          <UserContext.Provider value={user}>
-         <Text>Logged in</Text>
+       <>
+       <Text>Logged in</Text>
+         <Button title="logout" onPress={()=> auth()
+  .signOut()
+  .then(() => console.log('User signed out!'))}></Button>
+       </>
        </UserContext.Provider>
       ) : (
         <SignedOutStack />
