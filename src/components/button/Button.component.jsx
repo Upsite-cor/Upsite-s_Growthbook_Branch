@@ -2,7 +2,7 @@ import React from 'react';
 import {TouchableOpacity, Text, StyleSheet, View} from 'react-native';
 import {colors, typography} from '../../styles/theme.style';
 
-const Button = ({title, type = 'default', style = null, innerStyle =null,textStyle = null}) => {
+const Button = ({title, onPress, type = 'default', style = null, innerStyle =null,textStyle = null}) => {
 
   const getText = ()=>{
     return (
@@ -13,12 +13,12 @@ const Button = ({title, type = 'default', style = null, innerStyle =null,textSty
   return (
     <View style={style}>
       {type == 'default' && (
-        <TouchableOpacity style={styleProps}>
+        <TouchableOpacity onPress={onPress} style={styleProps}>
         {getText()}
         </TouchableOpacity>
       )}
       {type == 'outline' && (
-        <TouchableOpacity style={styleProps}>
+        <TouchableOpacity onPress={onPress} style={styleProps}>
         {getText()}
         </TouchableOpacity>
       )}

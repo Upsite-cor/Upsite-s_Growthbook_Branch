@@ -1,10 +1,19 @@
 import React from 'react';
-import {Image, View, Text, StyleSheet, TouchableOpacity} from 'react-native';
+import {
+  Image,
+  View,
+  Text,
+  StyleSheet,
+  TouchableOpacity,
+  ActivityIndicator,
+} from 'react-native';
 import Container from '../../components/layout/container/Container.component';
 import Logo from '../../assets/images/growthbookLogo-2.png';
-import Icon from 'react-native-vector-icons/FontAwesome';
 import {colors, typography} from '../../styles/theme.style';
 import Button from '../../components/button/Button.component';
+import Facebook from '../../authProviders/Facebook';
+import Google from '../../authProviders/Google';
+import Apple from '../../authProviders/Apple';
 
 const Header = ({title}) => {
   return (
@@ -13,43 +22,16 @@ const Header = ({title}) => {
         <Image style={styles.logo} source={Logo} />
       </View>
       <View style={styles.textContainer}>
-        <Text style={styles.textContent}>
-         {title}
-        </Text>
+        <Text style={styles.textContent}>{title}</Text>
       </View>
     </>
   );
 };
 
-const SocialLoginProvider = ({type}) => {
-  const icons = {
-    apple: 'apple',
-    google: 'google',
-    facebook: 'facebook-square',
-  };
-  const colors = {
-    apple: '#1f1f1f',
-    google: '#808080',
-    facebook: '#1877F2',
-  };
-  Capitalize = str => {
-    return str.charAt(0).toUpperCase() + str.slice(1);
-  };
-  return (
-    <TouchableOpacity style={[styles.provider, {borderColor: colors[type]}]}>
-      <View style={styles.providerContainer}>
-        <Icon size={30} color={colors[type]} name={icons[type]} />
-        <Text style={[styles.providerText, {color: colors[type]}]}>
-          Continue with {Capitalize(type)}
-        </Text>
-      </View>
-    </TouchableOpacity>
-  );
-};
-
 const LineBreak = () => {
   return (
-    <View style={{flexDirection: 'row', marginVertical: 20 , alignItems: 'center'}}>
+    <View
+      style={{flexDirection: 'row', marginVertical: 20, alignItems: 'center'}}>
       <View
         style={{flex: 1, height: 1, backgroundColor: colors.general.BRAND}}
       />
@@ -99,22 +81,36 @@ const TermOfService = () => {
   );
 };
 
-const Login = () => {
+const Login = ({navigation}) => {
   const providers = ['apple', 'google', 'facebook'];
   return (
     <View style={{flex: 1}}>
       <Container>
-        <Header title={"All growth begins with planting a simple seed…"}></Header>
+        <Header
+          title={'All growth begins with planting a simple seed…'}></Header>
         <View style={{gap: 15, marginTop: 55}}>
-          {providers.map((provider, index) => (
-            <SocialLoginProvider
-              key={index}
-              type={provider}></SocialLoginProvider>
-          ))}
+          {providers.map((provider, index) => {
+            if (provider == 'facebook') {
+              return <Facebook key={index} />;
+            }
+            if (provider == 'google') {
+              return <Google key={index} />;
+            }
+            if (provider == 'apple') {
+              return <Apple key={index} />;
+            }
+          })}
         </View>
         <LineBreak />
-        <Button title={"Login with Email"}/>
-        <Button style={{marginTop: 15}} title={"New to Growthboook? Create Account"} type={"outline"}/>
+        <Button
+          onPress={() => navigation.navigate('loginEmail')}
+          title={'Login with Email'}
+        />
+        <Button
+          style={{marginTop: 15}}
+          title={'New to Growthboook? Create Account'}
+          type={'outline'}
+        />
       </Container>
       <TermOfService />
     </View>
@@ -139,27 +135,7 @@ const styles = StyleSheet.create({
   textContent: {
     textAlign: 'center',
   },
-
-  //Social Login
-  provider: {
-    justifyContent: 'center',
-    alignItems: 'center',
-    borderRadius: 4,
-    borderWidth: 1,
-    borderStyle: 'solid',
-    padding: 10,
-    height: 50,
-  },
-  providerContainer: {
-    flexDirection: 'row',
-    gap: 15,
-  },
-  providerText: {
-    fontFamily: typography.fontFamilies.PRIMARY,
-    fontWeight: '600',
-    fontSize: 20,
-  },
 });
 
 export default Login;
-export {LineBreak, TermOfService, Header}
+export {LineBreak, TermOfService, Header};

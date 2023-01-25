@@ -5,17 +5,13 @@
  * @format
  */
 
-import React from 'react';
-import {NavigationContainer} from '@react-navigation/native';
-import CourseDetailv2 from './screens/mainApp/courseDetail/CourseDetailv2';
+import auth, { FirebaseAuthTypes } from '@react-native-firebase/auth';
+import { NavigationContainer } from '@react-navigation/native';
+import React, { createContext, useEffect, useState } from 'react';
+import { ActivityIndicator, Text, View } from 'react-native';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
-import { ActivityIndicator, View } from 'react-native';
+import SignedOutStack from './navigators/SignedOutStack';
 import { colors } from './styles/theme.style';
-import { useState, useEffect,createContext } from 'react';
-import Login from './screens/auth/Login';
-import LoginWithEmail from './screens/auth/LoginEmail';
-import auth, {FirebaseAuthTypes} from '@react-native-firebase/auth';
-import Signup from './screens/auth/Signup';
 
 type User = FirebaseAuthTypes.User | null;
 export const UserContext = createContext<User>(null);
@@ -138,13 +134,32 @@ useEffect(() => {
       setListenUser(true);
     }
   });
-
   return () => {
     if (authListener) {
       authListener();
     }
   };
 }, [initializing, listenUser]);
+
+  /** Listen for user changes */
+  useEffect(() => {
+    let userListener: () => void;
+
+    if (listenUser) {
+      // TODO @react-native-firebase/auth provides `onUserChanged` which is this and more.
+      // what else can we add and still be web-compatible?
+      userListener = auth().onIdTokenChanged(result => {
+        setUser(result);
+      });
+    }
+
+    return () => {
+      if (userListener) {
+        userListener();
+      }
+    };
+  }, [listenUser]);
+
 
   return (
     <SafeAreaProvider>
@@ -157,7 +172,14 @@ useEffect(() => {
        height:"100%",}}>
       <ActivityIndicator color={colors.general.BRAND}></ActivityIndicator>
       </View>}
-      <Signup />
+      { user ? (
+         <UserContext.Provider value={user}>
+         <Text>Logged in</Text>
+       </UserContext.Provider>
+      ) : (
+        <SignedOutStack />
+      )
+    }
     </NavigationContainer>
     </SafeAreaProvider>
   );

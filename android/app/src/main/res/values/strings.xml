@@ -1,3 +1,6 @@
 <resources>
     <string name="app_name">Growthbook</string>
+    <string name="facebook_app_id">495628046030016</string>
+    <string name="fb_login_protocol_scheme">fb495628046030016</string>
+    <string name="facebook_client_token">7655abfdfc104589e2382a9e4d1195cd</string>
 </resources>
