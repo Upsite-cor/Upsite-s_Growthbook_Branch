@@ -4,6 +4,7 @@ import { Alert } from 'react-native';
 import auth from '@react-native-firebase/auth';
 import { UserContext } from '../App';
 import SocialLoginProvider from '../components/authProviders/SocialLoginProvider';
+import { errorMessages } from '../constants/errorCode';
 
 
 const PROVIDER_ID = 'google.com';
@@ -32,20 +33,20 @@ const Google = () => {
         case statusCodes.SIGN_IN_CANCELLED:
         case '-1':
           return Alert.alert(
-            "Google Auth Error",
-            'Google authentication cancelled.',
+            errorMessages["googleAuthErrorTitle"],
+            errorMessages["googleAuthCancelled"],
             "Ok",
           );
         case statusCodes.IN_PROGRESS:
           return Alert.alert(
-            "Google Auth Error",
-            'Google authentication already in progress.',
+            errorMessages["googleAuthErrorTitle"],
+            errorMessages["googleAuthInProgress"],
             "Ok",
           );
         case statusCodes.PLAY_SERVICES_NOT_AVAILABLE:
           return Alert.alert(
-            "Google Auth Error",
-            'Google authentication requires Google Play services.',
+            errorMessages["googleAuthErrorTitle"],
+            errorMessages["googleAuthPlayServices"],
             "Ok",
           );
         default:
@@ -56,15 +57,15 @@ const Google = () => {
                   'https://github.com/react-native-google-signin/google-signin/blob/f21dd95a090f4f529748473e20515d6fc66db6bb/example/README.md#developer_error-or-code-10-on-android',
               );
               return Alert.alert(
-                "Google Auth Error",
-                'Google authentication is not configured correctly for this application.',
+                errorMessages["googleAuthErrorTitle"],
+                errorMessages["googleAuthConfigError"],
                 "Ok",
               );
             default:
               // TODO get catalog of all errors and translate them
               return Alert.alert(
-                "Google Auth Error",
-                error.message,
+                errorMessages["googleAuthErrorTitle"],
+                errorMessages[error.code] ?? error.message ,
                 "Ok",
               );
           }

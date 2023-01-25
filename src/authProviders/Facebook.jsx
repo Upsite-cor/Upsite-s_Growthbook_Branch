@@ -4,6 +4,7 @@ import { UserContext } from '../App';
 import SocialLoginProvider from '../components/authProviders/SocialLoginProvider';
 import auth from '@react-native-firebase/auth';
 import {AccessToken, LoginManager} from 'react-native-fbsdk-next';
+import { errorMessages } from '../constants/errorCode';
 
 const PROVIDER_ID = 'facebook.com';
 
@@ -21,7 +22,7 @@ const Facebook = () => {
           ]);
           if (isCancelled) {
             setLoading(false);
-            Alert.alert("Facebook Auth Error", "Facebook authentication cancelled.");
+            Alert.alert( errorMessages["facebookAuthErrorTitle"], errorMessages["facebookAuthCancelled"]);
           }else{
             const result = await AccessToken.getCurrentAccessToken();
             if (!result) {
@@ -35,10 +36,11 @@ const Facebook = () => {
           }
         }
         catch (error) {
+          console.log(error);
           setLoading(false);
           Alert.alert(
-            "Facebook Auth Error",
-            (error).message
+            errorMessages["facebookAuthErrorTitle"],
+            errorMessages[error.code] ?? error.message
           );
         }
       }
