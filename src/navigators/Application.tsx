@@ -6,6 +6,8 @@ import { useDispatch, useSelector } from 'react-redux';
 import Button from '../components/button/Button.component';
 import { hideLoader, showLoader } from '../features/loader/loaderSlice';
 import {colors} from '../styles/theme.style';
+import MainNavigation from './Main';
+import MainStack from './MainStack';
 import SignedOutStack from './SignedOutStack';
 
 type User = FirebaseAuthTypes.User | null;
@@ -77,16 +79,7 @@ const ApplicationNavigator = () => {
       )}
       {user ? (
         <UserContext.Provider value={user}>
-          <>
-            <Text>Logged in</Text>
-            <Button
-              title="logout"
-              onPress={() =>
-                auth()
-                  .signOut()
-                  .then(() => console.log('User signed out!'))
-              }></Button>
-          </>
+          <MainStack></MainStack>
         </UserContext.Provider>
       ) : (
         <SignedOutStack />

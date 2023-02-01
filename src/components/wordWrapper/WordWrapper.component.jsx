@@ -10,7 +10,7 @@ const WordWrapper = ({
 }) => {
   const [isExpanded, setIsExpanded] = useState(false);
   const [expandedText, setExpandedText] = useState(
-    text.split(' ').slice(0, 50).join(' ') + '...',
+    text?.split(' ')?.slice(0, 50)?.join(' ') ??"" + '...',
   );
 
   const handleClick = () => {

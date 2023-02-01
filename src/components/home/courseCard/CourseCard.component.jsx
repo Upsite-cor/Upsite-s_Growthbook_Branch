@@ -19,14 +19,14 @@ const CourseCard = ({ course, clickHandler }) => {
     };
 
     return (
-        <TouchableOpacity style={CourseCardStylesheet.container}>
+        <TouchableOpacity onPress={()=> clickHandler? clickHandler(course): ()=>{}} style={CourseCardStylesheet.container}>
             <View style={CourseCardStylesheet.imageContainer}>
             {isLoading && <ActivityIndicator  style={CourseCardStylesheet.activityLoader}/>}
             {!isError && <Image onError={handleError} onLoadEnd={handleLoaded} style={CourseCardStylesheet.image} source={{uri:course.coverArt}} />}
             {isError && <Image style={CourseCardStylesheet.image} source={errorImage} />}
             </View>
             <Text style={CourseCardStylesheet.title}>{course.title}</Text>
-            <Text style={CourseCardStylesheet.authorName}>{course.authorName}</Text>
+            <Text style={CourseCardStylesheet.authorName}>{course.author?.name}</Text>
             <View style={CourseCardStylesheet.ratingContainer}>
                 <Text style={CourseCardStylesheet.ratingAverageText}>{course.rating.average}</Text>
                 <StarRating

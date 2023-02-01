@@ -5,7 +5,7 @@ import { colors, typography } from '../../styles/theme.style';
 const AuthorHeader = ({author}) => {
   return (
     <View style={styles.container}>
-        <Image style={styles.image} source={{uri: author.profilePic}}/>
+        <Image style={styles.image} source={{uri: author?.profilePic}}/>
         <Text style={styles.text}>{author?.name}</Text>
     </View>
   )

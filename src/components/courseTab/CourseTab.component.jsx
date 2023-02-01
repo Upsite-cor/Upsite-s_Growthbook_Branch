@@ -2,9 +2,7 @@ import React, {useState} from 'react'
 import { View, Text, TouchableOpacity, StyleSheet } from 'react-native'
 import { colors, typography } from '../../styles/theme.style';
 
-const CourseTab = ({tabs= []}) => {
-
-    const [activeIndex, setActiveIndex] = useState(0);
+const CourseTab = ({tabs= [],activeIndex, setActiveIndex}) => {
     
    const handlePress = (index) => {
     setActiveIndex(index);

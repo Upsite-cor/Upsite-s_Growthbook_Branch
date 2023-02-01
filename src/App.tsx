@@ -24,7 +24,6 @@ const App = () => {
     coverArt: "https://firebasestorage.googleapis.com/v0/b/growthbook-ec77d.appspot.com/o/assets%2FcoverArts%2Fhd-wallpaper-3021072_640.jpg?alt=media&token=91a3e5b9-31be-40dd-aaf2-51f224a6f45b",
     title: "Start Your Own Travel Busines",
     description: "Travel Methodology is a unique Degree Program, designed to shine learners life, whoever takes this course seriously and learn and understand the course properly, I gurantee, they can start their own travel business in many travel business categories, after finishing this course. Learner will have multiple options and choices to choose their desired travel industry category to start their business from sctracth.",
-    authorName: "Mike Russel",
     rating:{
         average: 3,
         count: 10009
@@ -118,7 +117,8 @@ const App = () => {
             type: "quiz",
             contentId: "234053"
           }
-        ]
+        ],
+        authorName: "Mike Russel",
       }
     ]
 };

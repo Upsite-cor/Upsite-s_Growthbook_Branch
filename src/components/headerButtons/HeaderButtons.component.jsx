@@ -2,9 +2,9 @@ import React from "react";
 import { TouchableOpacity } from "react-native";
 import Icon from 'react-native-vector-icons/Ionicons';
 
-const HeaderButton = ({icon}) =>{
+const HeaderButton = ({icon, onPress}) =>{
     return(
-      <TouchableOpacity style={{
+      <TouchableOpacity onPress={()=> onPress? onPress(): ()=>{}} style={{
         backgroundColor:"white",
         width:40,
         height:40,

@@ -10,7 +10,7 @@ const iconForItem = {
     material: "file-text-o",
     quiz: "question-circle-o"
 }
-const TableOfContent = ({content}) => {
+const TableOfContent = ({content, isProgress=false, onPress=()=>{}}) => {
   const TableContentItem = ({item, isChapter = true}) => {
     return (
       <>
@@ -34,7 +34,7 @@ const TableOfContent = ({content}) => {
     </View>}
     {
         !isChapter && 
-        <TouchableOpacity>
+        <TouchableOpacity onPress={()=> onPress(item)}>
         <View
           style={[
             styles.itemContainer,
