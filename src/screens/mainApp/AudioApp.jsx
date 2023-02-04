@@ -152,7 +152,7 @@ const AudioApp = ({route, navigation}) => {
             minimumValue={0}
             maximumValue={progress.duration}
             thumbTintColor={colors.general.BRAND}
-            minimumTrackTintColorr={colors.general.BRAND}
+            minimumTrackTintColor={colors.general.BRAND}
             maximumTrackTintColor="#A6C6D0"
             onSlidingComplete={TrackPlayer.seekTo}
           />
