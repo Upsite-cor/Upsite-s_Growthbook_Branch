@@ -1,29 +1,27 @@
 import Slider from '@react-native-community/slider';
 import React from 'react';
-import { StyleSheet, Text, View } from 'react-native';
-import TrackPlayer, { useProgress } from 'react-native-track-player';
+import {StyleSheet, Text, View} from 'react-native';
+import TrackPlayer, {useProgress, State} from 'react-native-track-player';
+import { colors } from '../../../styles/theme.style';
 
-export const Progress = ({ live }) => {
+export const Progress = ({state}) => {
   const progress = useProgress();
-  return live ? (
-    <View style={styles.liveContainer}>
-      <Text style={styles.liveText}>Live Stream</Text>
-    </View>
-  ) : (
-    <>
+  return (
+    <View>
       <Slider
+        disabled={state!=State.Playing}
         style={styles.container}
         value={progress.position}
         minimumValue={0}
         maximumValue={progress.duration}
-        thumbTintColor="#FFD479"
-        minimumTrackTintColor="#FFD479"
-        maximumTrackTintColor="#FFFFFF"
+        thumbTintColor={colors.general.BRAND}
+        minimumTrackTintColor={colors.general.BRAND}
+        maximumTrackTintColor="#A6C6D0"
         onSlidingComplete={TrackPlayer.seekTo}
       />
       <View style={styles.labelContainer}>
         <Text style={styles.labelText}>
-          {new Date(progress.position * 1000).toISOString().slice(14, 19)}
+          {new Date((progress.position>0? progress.position: 0) * 1000).toISOString().slice(14, 19)}
         </Text>
         <Text style={styles.labelText}>
           {new Date((progress.duration - progress.position) * 1000)
@@ -31,34 +29,22 @@ export const Progress = ({ live }) => {
             .slice(14, 19)}
         </Text>
       </View>
-    </>
+    </View>
   );
 };
 
 const styles = StyleSheet.create({
-  liveContainer: {
-    height: 100,
-    alignItems: 'center',
-    flexDirection: 'row',
-  },
-  liveText: {
-    color: 'white',
-    alignSelf: 'center',
-    fontSize: 18,
-  },
   container: {
     height: 40,
-    width: 380,
     marginTop: 25,
     flexDirection: 'row',
   },
   labelContainer: {
-    width: 370,
     flexDirection: 'row',
     justifyContent: 'space-between',
   },
   labelText: {
-    color: 'white',
+    color: '#B8B7B5',
     fontVariant: ['tabular-nums'],
   },
 });

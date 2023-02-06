@@ -2,23 +2,21 @@ import React from 'react';
 import { View, StyleSheet } from 'react-native';
 import TrackPlayer from 'react-native-track-player';
 
-import { Button } from './Button';
+import { PlayerButton } from '../atoms/PlayerButton';
 import { PlayPauseButton } from './PlayPauseButton';
 
-export const PlayerControls = () => {
+export const PlayerControls = ({state}) => {
   return (
-    <View style={{ width: '100%' }}>
+    <View style={styles.container}>
       <View style={styles.row}>
-        <Button
-          title="Prev"
+        <PlayerButton
+          type="back"
           onPress={() => TrackPlayer.skipToPrevious()}
-          type="secondary"
         />
-        <PlayPauseButton />
-        <Button
-          title="Next"
+        <PlayPauseButton state={state}/>
+        <PlayerButton
           onPress={() => TrackPlayer.skipToNext()}
-          type="secondary"
+          type="forward"
         />
       </View>
     </View>
@@ -28,9 +26,11 @@ export const PlayerControls = () => {
 const styles = StyleSheet.create({
   container: {
     width: '100%',
+    marginTop:30
   },
   row: {
     flexDirection: 'row',
     justifyContent: 'space-evenly',
+    alignItems:"center"
   },
 });

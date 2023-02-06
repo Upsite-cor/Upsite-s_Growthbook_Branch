@@ -1,13 +1,12 @@
 import React from 'react';
 import { ActivityIndicator, StyleSheet, View } from 'react-native';
 import { State, usePlaybackState } from 'react-native-track-player';
-import { useOnTogglePlayback } from '../../hooks/audioPlayer';
-import { useDebouncedValue } from '../../hooks/audioPlayer/useDebouncedValue';
+import { useOnTogglePlayback } from '../../../hooks/audioPlayer';
+import { useDebouncedValue } from '../../../hooks/audioPlayer/useDebouncedValue';
 
-import { Button } from './Button';
+import { PlayerButton } from '../atoms/PlayerButton';
 
-export const PlayPauseButton = () => {
-  const state = usePlaybackState();
+export const PlayPauseButton = ({state}) => {
   const isPlaying = state === State.Playing;
   const isLoading = useDebouncedValue(
     state === State.Connecting || state === State.Buffering,
@@ -18,17 +17,14 @@ export const PlayPauseButton = () => {
 
   if (isLoading) {
     return (
-      <View style={styles.statusContainer}>
-        {isLoading && <ActivityIndicator />}
-      </View>
+      <ActivityIndicator />
     );
   }
 
   return (
-    <Button
-      title={isPlaying ? 'Pause' : 'Play'}
+    <PlayerButton
+      type={isPlaying ? 'pause' : 'play'}
       onPress={onTogglePlayback}
-      type="primary"
       style={styles.playPause}
     />
   );
@@ -38,11 +34,5 @@ const styles = StyleSheet.create({
   playPause: {
     width: 120,
     textAlign: 'center',
-  },
-  statusContainer: {
-    height: 40,
-    width: 120,
-    marginTop: 20,
-    marginBottom: 60,
-  },
+  }
 });

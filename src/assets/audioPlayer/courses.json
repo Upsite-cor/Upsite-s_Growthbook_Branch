@@ -1,0 +1,27 @@
+[
+  {
+    "artist": "Whip",
+    "coverArt": "https://react-native-track-player.js.org/example/Longing.jpeg",
+    "file": "https://react-native-track-player.js.org/example/hls/whip/playlist.m3u8",
+    "id": "9vNB8HY5ZqojOAmOMMWA",
+    "type": "hls"
+  },
+  {
+    "artist": "David Chavez",
+    "coverArt": "https://react-native-track-player.js.org/example/Soul%20Searching.jpeg",
+    "file": "https://react-native-track-player.js.org/example/Longing.mp3",
+    "id": "XI41MicrbALQWqDsphTb"
+  },
+  {
+    "artist": "Umer",
+    "coverArt": "https://react-native-track-player.js.org/example/Lullaby%20(Demo).jpeg",
+    "file": "\"https://react-native-track-player.js.org/example/Rhythm%20City%20(Demo).mp3",
+    "id": "aRNdEFVTTT2qpFxl0FVN"
+  },
+  {
+    "artist": "David Chavez",
+    "coverArt": "https://react-native-track-player.js.org/example/Rhythm%20City%20(Demo).jpeg",
+    "file": "https://react-native-track-player.js.org/example/Soul%20Searching.mp3",
+    "id": "cRWe8YvJZlN7zt43hfqM"
+  }
+]

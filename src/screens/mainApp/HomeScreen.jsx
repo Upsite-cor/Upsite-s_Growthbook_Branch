@@ -15,7 +15,6 @@ import {hideLoader, showLoader} from '../../features/loader/loaderSlice';
 import firestore from '@react-native-firebase/firestore';
 
 export const HomeScreen = ({navigation}) => {
-  const [loaded, setLoaded] = useState(false);
   const [pills, setPills] = useState([]);
   const [latestCourses, setLatestCourses] = useState([]);
   const dispatch = useDispatch();
@@ -49,12 +48,11 @@ export const HomeScreen = ({navigation}) => {
   };
 
   useEffect(() => {
-    const unsubscribe = navigation.addListener('focus', () => {
+    const unsubscribe = navigation.addListener('focus', async () => {
       dispatch(showLoader());
       try{
-        fetchCategories();
-        fetchCourses();
-        setLoaded(true);
+        await fetchCategories();
+        await fetchCourses();
         dispatch(hideLoader());
         }catch(e){
             dispatch(hideLoader());

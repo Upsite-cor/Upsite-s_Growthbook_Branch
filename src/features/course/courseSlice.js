@@ -1,15 +1,15 @@
 import { createSlice } from "@reduxjs/toolkit";
 
 const initialState= {
-    course: null,
+    courseId: "",
     media: [],
 }
 const courseSlice  = createSlice({
     name: 'course',
     initialState: initialState,
     reducers:{
-        updateCourse: (state, action) =>{
-            state.course=action.payload;
+        updateCourseId: (state, action) =>{
+            state.courseId=action.payload;
         },
         updateMedia: (state, action)=>{
             state.media = [...action.payload];
@@ -17,6 +17,6 @@ const courseSlice  = createSlice({
     }
 });
 
-export const {updateCourse, updateMedia} = courseSlice.actions;
+export const {updateCourseId, updateMedia} = courseSlice.actions;
 export default courseSlice.reducer;
 
