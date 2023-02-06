@@ -19,54 +19,52 @@ export const HomeScreen = ({navigation}) => {
   const [latestCourses, setLatestCourses] = useState([]);
   const dispatch = useDispatch();
 
-  const fetchCategories = () => {
-    const collection = firestore().collection('categories');
-    collection
-      .limit(5)
-      .get()
-      .then(querySnapshot => {
-        let list = [];
-        querySnapshot.forEach(documentSnapshot => {
-          list.push({...documentSnapshot.data(), id: documentSnapshot.id});
-        });
-        setPills(list);
+  const fetchCategories = async () => {
+    let list = [];
+    try {
+      const collection = await firestore()
+        .collection('categories')
+        .limit(5)
+        .get();
+      collection.forEach(documentSnapshot => {
+        list.push({...documentSnapshot.data(), id: documentSnapshot.id});
       });
+    } catch (e) {}
+    return list;
   };
 
-  const fetchCourses = () => {
-    const collection = firestore().collection('courses');
-    collection
-      .limit(3)
-      .get()
-      .then(querySnapshot => {
-        let list = [];
-        querySnapshot.forEach(documentSnapshot => {
-          list.push({...documentSnapshot.data(), id: documentSnapshot.id});
-        });
-        setLatestCourses(list);
+  const fetchCourses = async () => {
+    let list = [];
+    try {
+      const collection = await firestore().collection('courses').limit(3).get();
+      collection.forEach(documentSnapshot => {
+        list.push({...documentSnapshot.data(), id: documentSnapshot.id});
       });
+    } catch (e) {}
+    return list;
   };
 
   useEffect(() => {
     const unsubscribe = navigation.addListener('focus', async () => {
       dispatch(showLoader());
-      try{
-        await fetchCategories();
-        await fetchCourses();
+      try {
+        const cetegories = await fetchCategories();
+        const courses = await fetchCourses();
+        setPills(cetegories);
+        setLatestCourses(courses);
+      } catch (e) {
+        Alert.alert(error.message);
+      } finally {
         dispatch(hideLoader());
-        }catch(e){
-            dispatch(hideLoader());
-            Alert.alert(error.message);
-        }    
+      }
     });
 
     // Return the function to unsubscribe from the event so it gets removed on unmount
     return unsubscribe;
   }, [navigation]);
 
-
-  const courseOpened = (course) => {
-    navigation.navigate('course', { payload:course });
+  const courseOpened = course => {
+    navigation.navigate('course', {payload: course});
   };
 
   return (
@@ -82,7 +80,10 @@ export const HomeScreen = ({navigation}) => {
       <ActionHeader heading={'Latest Courses'} />
       <CourseList courses={latestCourses} clickHandler={courseOpened} />
       <ActionHeader heading={'Popular Courses'} />
-      <CourseList courses={[...latestCourses.slice().reverse()]} clickHandler={courseOpened}/>
+      <CourseList
+        courses={[...latestCourses.slice().reverse()]}
+        clickHandler={courseOpened}
+      />
     </Container>
   );
 };

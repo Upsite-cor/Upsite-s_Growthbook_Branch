@@ -3,52 +3,79 @@ import {Image, StyleSheet, Text, TouchableOpacity, View} from 'react-native';
 import courseNoSyllabus from '../../assets/images/courseNoSyllabus.png';
 import {colors, typography} from '../../styles/theme.style';
 import Icon from 'react-native-vector-icons/FontAwesome';
-
+import CheckIcon from 'react-native-vector-icons/AntDesign';
 
 const iconForItem = {
-    audio :"file-audio-o",
-    material: "file-text-o",
-    quiz: "question-circle-o"
-}
-const TableOfContent = ({content, isProgress=false, onPress=()=>{}}) => {
+  audio: 'file-audio-o',
+  material: 'file-text-o',
+  quiz: 'question-circle-o',
+};
+const TableOfContent = ({content, isProgress = false, onPress = () => {}}) => {
   const TableContentItem = ({item, isChapter = true}) => {
     return (
       <>
-      {isChapter && 
-      <View>
-      <View
-        style={[
-          styles.itemContainer,
-          {
-            backgroundColor: colors.general.BACKGROUND,
-              
-          },
-        ]}>
-        <Text style={[styles.itemText, {
-          fontWeight:  "700"
-        }]}>{item.title}</Text>
-      </View>
-      {item?.child?.map((subItem)=> (
-          <TableContentItem key={subItem?.id} item={subItem} isChapter={false}/>
-      ))}
-    </View>}
-    {
-        !isChapter && 
-        <TouchableOpacity onPress={()=> onPress(item)}>
-        <View
-          style={[
-            styles.itemContainer,
-            {
-              backgroundColor: colors.general.WHITE,
-            },
-          ]}>
-            <Icon size={20} name={iconForItem[item.type]}></Icon>
-          <Text style={[styles.itemText, {
-            fontWeight: "400"
-          }]}>{item.title}</Text>
-        </View>
-      </TouchableOpacity>
-    }
+        {isChapter && (
+          <View>
+            <View
+              style={[
+                styles.itemContainer,
+                {
+                  backgroundColor: colors.general.BACKGROUND,
+                },
+              ]}>
+              <Text
+                style={[
+                  styles.itemText,
+                  {
+                    fontWeight: '700',
+                  },
+                ]}>
+                {item.title}
+              </Text>
+            </View>
+            {item?.child?.map(subItem => (
+              <TableContentItem
+                key={subItem?.id}
+                item={subItem}
+                isChapter={false}
+              />
+            ))}
+          </View>
+        )}
+        {!isChapter && (
+          <TouchableOpacity onPress={() => onPress(item)}>
+            <View
+              style={{
+                flexDirection: 'row',
+                justifyContent: 'space-between',
+                alignItems: 'center',
+              }}>
+              <View
+                style={[
+                  styles.itemContainer,
+                  {
+                    backgroundColor: colors.general.WHITE,
+                  },
+                ]}>
+                <Icon size={20} name={iconForItem[item.type]}></Icon>
+                <Text
+                  style={[
+                    styles.itemText,
+                    {
+                      fontWeight: '400',
+                    },
+                  ]}>
+                  {item.title}
+                </Text>
+              </View>
+              <View>
+                {item.isCompleted && (
+                  <CheckIcon size={20} color="#248A3D" name="checkcircleo" />
+                )}
+              </View>
+            </View>
+          </TouchableOpacity>
+        )}
       </>
     );
   };
@@ -97,15 +124,15 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
     paddingVertical: 15,
     marginHorizontal: -16,
-    flexDirection:"row",
-              alignItems: "center",
-              gap: 10
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 10,
   },
-  itemText:{
+  itemText: {
     fontFamily: typography.fontFamilies.PRIMARY,
     color: colors.font.PRIMARY,
-    fontSize: 16
-  }
+    fontSize: 16,
+  },
 });
 
 export default TableOfContent;

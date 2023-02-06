@@ -54,6 +54,7 @@ export const QueueInitialTracksService = async syllabus => {
           artist: item.artist ?? '',
           album: lesson.album,
           isCompleted: lesson.isCompleted,
+          contentId: lesson.contentId,
           artwork: item.coverArt,
         });
       }

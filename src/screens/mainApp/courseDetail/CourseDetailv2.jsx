@@ -40,24 +40,27 @@ const CourseDetailv2 = ({route, navigation}) => {
   // const [reviews, setReviews] = useState([]);
   // const [author, setAuthor] = useState({});
   var reviews = [];
-  var syllabus =[];
-  var reviews =[];
+  var syllabus = [];
+  var reviews = [];
   const dispatch = useDispatch();
   const insets = useSafeAreaInsets();
 
   const fetchRatings = async () => {
-   return await firestore().collection('reviews').where('courseId', '==', course.id)
-   .limit(5)
-   .get();
+    return await firestore()
+      .collection('reviews')
+      .where('courseId', '==', course.id)
+      .limit(5)
+      .get();
   };
   const fetchSyllabus = async () => {
-    return await firestore().collection('syllabus').where('courseId', '==', course.id)
-    .limit(1)
-    .get();
+    return await firestore()
+      .collection('syllabus')
+      .where('courseId', '==', course.id)
+      .limit(1)
+      .get();
   };
   const fetchAuthor = async () => {
-    return await firestore().collection('authors').doc(course.author?.id)
-    .get();
+    return await firestore().collection('authors').doc(course.author?.id).get();
   };
 
   const fetchData = async () => {
@@ -67,9 +70,9 @@ const CourseDetailv2 = ({route, navigation}) => {
       const syllabusCollection = await fetchSyllabus();
       const authorCollection = await fetchAuthor();
 
-      let localRatings = []
-      ratingCollection.docs.forEach(document=>{
-        localRatings.push({...document.data(), id:document.id});
+      let localRatings = [];
+      ratingCollection.docs.forEach(document => {
+        localRatings.push({...document.data(), id: document.id});
       });
 
       let localAuthor = authorCollection.data();
@@ -85,9 +88,7 @@ const CourseDetailv2 = ({route, navigation}) => {
     } catch (e) {
       dispatch(hideLoader());
     }
-   
-    
-  }
+  };
 
   useEffect(() => {
     fetchData();
@@ -382,17 +383,27 @@ const CourseDetailv2 = ({route, navigation}) => {
   const DescriptionSection = ({course}) => {
     return (
       <>
-        <ContentSection title={'Course Description'}>
-          <WordWrapper text={course.description} />
-        </ContentSection>
-        <ContentSection title={'Skills you will gain'}>
-          <SkillPillHolder skills={course.skills}></SkillPillHolder>
-        </ContentSection>
-        <ContentSection title={'What you will learn'}>
-          <SkillPillHolder
-            skills={course.learning}
-            supporticons></SkillPillHolder>
-        </ContentSection>
+        {course.description && (
+          <ContentSection title={'Course Description'}>
+            <WordWrapper text={course.description} />
+          </ContentSection>
+        )}
+        {( course.learning && course.learning?.length >
+          0)
+           && (
+              <ContentSection title={'Skills you will gain'}>
+                <SkillPillHolder skills={course.skills}></SkillPillHolder>
+              </ContentSection>
+            )}
+        {course.learning &&
+          course.learning?.length >
+          0 &&(
+              <ContentSection title={'What you will learn'}>
+                <SkillPillHolder
+                  skills={course.learning}
+                  supporticons></SkillPillHolder>
+              </ContentSection>
+            )}
         <ContentSection title={'About the Author'}>
           <AuthorHeader author={course.author} />
           <WordWrapper text={course.author?.bio} />
@@ -498,8 +509,8 @@ const CourseDetailv2 = ({route, navigation}) => {
   };
 
   const viewProgress = () => {
-    navigation.replace('courseNavigation', {payload: {courseId: course.id}})
-  }
+    navigation.replace('courseNavigation', {payload: {courseId: course.id}});
+  };
   return (
     <>
       <Container
@@ -513,23 +524,18 @@ const CourseDetailv2 = ({route, navigation}) => {
           {this.renderHeaderTitle()}
           {this.renderHeaderForeground()}
         </View>
-        { course.enrollments.includes(user.uid)&& 
-        <Button
-        onPress={() => viewProgress()}
-        title={
-         'View Progress'
-        }
-        style={{marginHorizontal: 16}}></Button>
-        }
-         { !course.enrollments.includes(user.uid)&& 
-        <Button
-        onPress={() => enrollIntoCourse()}
-        title={
-         'Enroll'
-        }
-        style={{marginHorizontal: 16}}></Button>
-        }
-        
+        {course.enrollments.includes(user.uid) && (
+          <Button
+            onPress={() => viewProgress()}
+            title={'View Progress'}
+            style={{marginHorizontal: 16}}></Button>
+        )}
+        {!course.enrollments.includes(user.uid) && (
+          <Button
+            onPress={() => enrollIntoCourse()}
+            title={'Enroll'}
+            style={{marginHorizontal: 16}}></Button>
+        )}
       </Container>
     </>
   );

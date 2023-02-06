@@ -3,6 +3,7 @@ import AudioApp from '../screens/player/AudioApp';
 import CourseDetailv2 from '../screens/mainApp/courseDetail/CourseDetailv2';
 import CourseNavigation from '../screens/mainApp/CourseNavigation';
 import MainNavigation from './Main';
+import LectureViewer from '../screens/mainApp/LectureViewer';
 
 const Stack = createNativeStackNavigator();
 
@@ -28,6 +29,11 @@ const MainStack = () =>{
             name="audioPlayer"
             options={{headerShown: false, tabBarVisible: false}}
             component={AudioApp}
+          />
+           <Stack.Screen
+            name="lectureViewer"
+            options={{headerShown: false, tabBarVisible: false}}
+            component={LectureViewer}
           />
         </Stack.Navigator>
       );

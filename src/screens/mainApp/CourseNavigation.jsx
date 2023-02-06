@@ -37,10 +37,25 @@ const CourseNavigation = ({route, navigation}) => {
     dispatch(hideLoader());
 
   };
-  useEffect(()=>{
-    fetchData();
 
-  },[]);
+  useEffect(() => {
+    const unsubscribe = navigation.addListener('focus', async () => {
+      fetchData();
+    });
+
+    // Return the function to unsubscribe from the event so it gets removed on unmount
+    return unsubscribe;
+  }, [navigation]);
+
+
+  const handleNavigation = (event) => {
+    const routes = {
+      "audio": "audioPlayer",
+      "quiz": "quizPlayer",
+      "material": "lectureViewer"
+    }
+    navigation.navigate(routes[event?.type], {payload: {item: event, courseId: payload.courseId, progress:progress}});
+  }
   return (
     <>
       <Container>
@@ -69,7 +84,7 @@ const CourseNavigation = ({route, navigation}) => {
           Table of Content
         </Text>
        <View style={{marginTop: 15}}>
-       <TableOfContent  content={progress?.syllabus} onPress={(event)=>{navigation.navigate(event?.type=="audio"? "audioPlayer": "", {payload: {item: event, courseId: payload.courseId, progress:progress}})}}></TableOfContent>
+       <TableOfContent  content={progress?.syllabus} onPress={handleNavigation}></TableOfContent>
        </View>
       </Container>
     </>

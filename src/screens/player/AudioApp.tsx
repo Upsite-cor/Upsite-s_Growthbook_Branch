@@ -21,27 +21,30 @@ const AudioApp = ({route, navigation}: IProps) => {
   const dispatch = useDispatch();
   const {payload} = route.params;
 
-  useEffect(() => {
+  const setupAudioplayer = async () => {
     if(isPlayerReady){
       dispatch(showLoader());
      if (currentCourseId != payload?.courseId) {
-        QueueInitialTracksService(payload.progress);
+        await QueueInitialTracksService(payload.progress);
         dispatch(updateCourseId(payload?.courseId));
-     }else{
-        TrackPlayer.getQueue().then(res=>{
-           var index = res.findIndex(x=> x.id==payload.item?.id);
-           if(index!=-1){
-            TrackPlayer.getCurrentTrack().then(currentIndex=>{
-              if(currentIndex!=index){
-                TrackPlayer.skip(index, -1);
-              }
-             })
-           }
-           
-        });
      }
+     TrackPlayer.getQueue().then(res=>{
+      var index = res.findIndex(x=> x.id==payload.item?.id);
+      if(index!=-1){
+       TrackPlayer.getCurrentTrack().then(currentIndex=>{
+         if(currentIndex!=index){
+           TrackPlayer.skip(index, -1);
+         }
+        })
+      }
+      
+   });
      dispatch(hideLoader());
    }
+  }
+
+  useEffect(() => {
+    setupAudioplayer();
   }, [isPlayerReady]);
 
   return (
