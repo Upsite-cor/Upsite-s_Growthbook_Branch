@@ -4,6 +4,8 @@ import CourseDetailv2 from '../screens/mainApp/courseDetail/CourseDetailv2';
 import CourseNavigation from '../screens/mainApp/CourseNavigation';
 import MainNavigation from './Main';
 import LectureViewer from '../screens/mainApp/LectureViewer';
+import QuizInfo from '../screens/quiz/QuizInfo';
+import QuizAttempt from '../screens/quiz/QuizAttempt';
 
 const Stack = createNativeStackNavigator();
 
@@ -34,6 +36,16 @@ const MainStack = () =>{
             name="lectureViewer"
             options={{headerShown: false, tabBarVisible: false}}
             component={LectureViewer}
+          />
+           <Stack.Screen
+            name="quizPlayer"
+            options={{headerShown: false,tabBarVisible: false}}
+            component={QuizInfo}
+          />
+           <Stack.Screen
+            name="quizAttempt"
+            options={{headerShown: false, tabBarVisible: false}}
+            component={QuizAttempt}
           />
         </Stack.Navigator>
       );

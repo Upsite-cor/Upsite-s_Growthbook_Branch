@@ -4,13 +4,13 @@ import {SafeAreaProvider, SafeAreaView} from 'react-native-safe-area-context';
 import ContainerStylesheet from './Container.component.style';
 
 
-const Container = ({children, useDefaultSafeArea = true, edges= ["top", "bottom"], isScrollable = true}) => {
+const Container = ({children, useDefaultSafeArea = true, edges= ["top", "bottom"], isScrollable = true, addPadding= true}) => {
 
     const renderBody = ({children, isScrollable= true}) =>{
         return(
             <>
             { isScrollable && (
-                <ScrollView style={ContainerStylesheet.container}>
+                <ScrollView style={addPadding? ContainerStylesheet.container: ""}>
             {children}
           </ScrollView>
             )}

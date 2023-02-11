@@ -8,6 +8,7 @@ import { hideLoader, showLoader } from '../../features/loader/loaderSlice';
 import firestore from '@react-native-firebase/firestore';
 import { UserContext } from '../../navigators/Application';
 import TableOfContent from '../../components/tableOfContent/TableOfContent.component';
+import BackHeader from '../../components/navigation/organisms/BackHeader';
 
 
 const CourseNavigation = ({route, navigation}) => {
@@ -59,30 +60,7 @@ const CourseNavigation = ({route, navigation}) => {
   return (
     <>
       <Container>
-        <View style={{flexDirection: 'row', alignItems: 'center'}}>
-          <TouchableOpacity
-            onPress={() => navigation.goBack()}
-            style={{
-              backgroundColor: 'white',
-              width: 40,
-              height: 40,
-              borderRadius: 50,
-              alignItems: 'center',
-              justifyContent: 'center',
-            }}>
-            <Icon name={'chevron-back'} size={24} />
-          </TouchableOpacity>
-        </View>
-        <Text
-          style={{
-            textAlign: 'center',
-            fontFamily: typography.fontFamilies.PRIMARY,
-            fontWeight: '600',
-            fontSize:24,
-            color: colors.font.BRAND
-          }}>
-          Table of Content
-        </Text>
+      <BackHeader onPress={() => navigation.goBack()} text={"Table Of Content"} />
        <View style={{marginTop: 15}}>
        <TableOfContent  content={progress?.syllabus} onPress={handleNavigation}></TableOfContent>
        </View>
