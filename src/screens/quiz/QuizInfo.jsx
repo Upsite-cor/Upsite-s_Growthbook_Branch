@@ -15,19 +15,33 @@ import {
   compareArrays,
 } from '../../utils';
 import {UserContext} from '../../navigators/Application';
-import {BaseNavigationContainer} from '@react-navigation/native';
+import { isContentCompleted, markContentCompleted } from '../../services/courses/progressService';
 
 const QuizInfo = ({route, navigation}) => {
   const [quiz, setQuiz] = useState();
-  const [validAttempt, setValidAttempt] = useState(null);
-  const [count, setCount] = useState();
-  const [intervalId, setIntervalId] = useState(null);
   const [completedAttempts, setCompletedAttempts] = useState([]);
+  const [isPassed, setPassed] = useState(false);
 
   const user = useContext(UserContext);
 
   const dispatch = useDispatch();
   const {payload} = route.params;
+
+  const fetchProgress = async () => {
+    const progress= await firestore().collection('progress').where('courseId','==', payload.courseId)
+    .where('userId','==', user.uid)
+    .limit(1)
+    .get();
+    const id = progress.docs[0].id;
+    return {...progress.docs[0].data(), id: id};
+  };
+
+  const updateProgress = async (progress) =>{
+    await firestore()
+  .collection('progress')
+  .doc(progress.id)
+  .update(progress);
+  }
 
   const fetchQuiz = async () => {
     const quiz = await firestore()
@@ -53,10 +67,6 @@ const QuizInfo = ({route, navigation}) => {
     if (completedAttempts?.length == 0) {
       return '-';
     }
-    completedAttempts.push({
-      obtainedMarks: 20,
-      startTime: new Date().getTime(),
-    });
     const totalMarks = quiz?.totalMarks;
     passingScore = completedAttempts
       .map(item => {
@@ -143,7 +153,6 @@ const QuizInfo = ({route, navigation}) => {
   const fetchAttempts = async quiz => {
     const completedAttempts = [];
     const attemptsToRevoke = [];
-    var validAttempt = null;
 
     const attemptsRaw = await firestore()
       .collection('quizAttempts')
@@ -155,16 +164,17 @@ const QuizInfo = ({route, navigation}) => {
       if (attempt?.status && attempt?.status == 'completed') {
         completedAttempts.push(attempt);
       } else {
-        var elapsedTime = new Date().getTime() - attempt?.startTime;
-        if (elapsedTime / 1000 < quiz?.time) {
-          if (!validAttempt) {
-            validAttempt = attempt;
-          } else {
-            attemptsToRevoke.push(attempt);
-          }
-        } else {
-          attemptsToRevoke.push(attempt);
-        }
+        attemptsToRevoke.push(attempt);
+        // var elapsedTime = new Date().getTime() - attempt?.startTime;
+        // if (elapsedTime / 1000 < quiz?.time) {
+        //   if (!validAttempt) {
+        //     validAttempt = attempt;
+        //   } else {
+        //     attemptsToRevoke.push(attempt);
+        //   }
+        // } else {
+        //   attemptsToRevoke.push(attempt);
+        // }
       }
     });
 
@@ -172,18 +182,46 @@ const QuizInfo = ({route, navigation}) => {
       attempt = await evaluateAttempt(attempt, quiz);
       completedAttempts.push(attempt);
     }
-    return [validAttempt, completedAttempts];
+    return completedAttempts;
   };
+  const checkIfPassed =async (completedAttempts, quiz) => {
+    if (completedAttempts?.length == 0) {
+      return;
+    }
+    const totalMarks = quiz?.totalMarks;
+    passingScore = completedAttempts
+      .map(item => {
+        return {
+          date: item.startTime,
+          percentage: item?.obtainedMarks / totalMarks,
+        };
+      })
+      .sort((a, b) => b.percentage - a.percentage)[0];
+    if (
+      passingScore &&
+      passingScore?.percentage * 100 >= quiz?.passingPercentage
+    ) {
+      const progress = await fetchProgress();
+      if(!isContentCompleted(payload?.item?.contentId, progress)){
+        const updatedProgress=  markContentCompleted(payload?.item?.contentId, progress);
+        await updateProgress(updatedProgress);
+      }   
+    }
+  }
   const fetchPayload = async () => {
     dispatch(showLoader());
+    if(payload?.item?.isCompleted && !isPassed){
+      setPassed(true);
+    }
     try {
       const fetchedQuiz = await fetchQuiz();
-      const [validAttempt, completedAttempts] = await fetchAttempts(
+      const completedAttempts = await fetchAttempts(
         fetchedQuiz,
       );
+      if(!isPassed && !payload?.item?.isCompleted){
+        await checkIfPassed(completedAttempts, fetchedQuiz);
+      }
       setQuiz(fetchedQuiz);
-      setValidAttempt(validAttempt);
-      console.log(new Date().getTime());
       setCompletedAttempts(completedAttempts);
     } catch (e) {
       console.log(e);
@@ -192,20 +230,32 @@ const QuizInfo = ({route, navigation}) => {
     }
   };
   const startQuiz = async () => {
-    stopCount();
-    navigation.navigate('quizAttempt');
+    var attempt = {
+      courseId: payload?.courseId,
+      obtainedMarks: 0,
+      quizId: quiz?.id,
+      startTime: new Date().getTime(),
+      status: "pending",
+      userId: user.uid,
+      answers: []
+    };
+    attempt.answers = quiz?.questions?.map(question => {
+      return {
+        id: generateId(),
+        questionId: question.id,
+        obtainedMark: 0,
+        answer: {
+          givenAnswer: '',
+          givenAnswers: [],
+        },
+      };
+    });
+    const attemptRaw =await  firestore()
+    .collection('quizAttempts')
+    .add(attempt);
+    navigation.navigate('quizAttempt', { payload:{ attempt: {...attempt, id: attemptRaw.id}, quiz: quiz}});
   };
-  const startReducer = ()=>{
-    const id = setInterval(() => {
-      setCount(prev=> prev-1);
-    }, 1000);
-    setIntervalId(id);
-  }
 
-  const stopCount = () =>{
-    clearInterval(intervalId);
-    setIntervalId(null);
-  }
   useEffect(() => {
     const unsubscribe = navigation.addListener('focus', async () => {
       await fetchPayload();
@@ -213,10 +263,6 @@ const QuizInfo = ({route, navigation}) => {
 
     return unsubscribe;
   }, [navigation]);
-
-  useEffect(() => {
-    return () => clearInterval(intervalId);
-  }, [intervalId]);
 
   return (
     <Container isScrollable={false}>
@@ -227,7 +273,6 @@ const QuizInfo = ({route, navigation}) => {
         </View>
         {quiz && (
           <>
-            {count && <Text>{count}</Text>}
             <View style={{marginHorizontal: 16}}>
               <Text
                 style={{
@@ -298,7 +343,6 @@ const QuizInfo = ({route, navigation}) => {
                 position: 'absolute',
               }}>
               <Button title="Start" onPress={startQuiz}></Button>
-              
             </View>
           </>
         )}
