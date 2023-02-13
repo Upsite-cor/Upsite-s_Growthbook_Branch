@@ -73,7 +73,7 @@ export const HomeScreen = ({navigation}) => {
         <Image style={{width: 218, height: 45}} source={growthbookLogo2} />
       </View>
       <Text style={globalStylesheet.heading}>Explore</Text>
-      <SearchButton />
+      <SearchButton clickHandler={()=> {navigation.navigate("Search")}}/>
       <MarketingSlideContainer />
       <ActionHeader heading={'Categories'} />
       <CategoryBox categories={pills} />

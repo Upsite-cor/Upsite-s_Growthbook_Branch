@@ -3,6 +3,8 @@ import {HomeScreen} from '../screens/mainApp/HomeScreen';
 import Icon from 'react-native-vector-icons/FontAwesome';
 import Search from '../screens/mainApp/Search';
 import { colors } from '../styles/theme.style';
+import LearnScreen from '../screens/mainApp/LearnScreen';
+import Profile from '../screens/mainApp/Profile';
 
 const Tab = createBottomTabNavigator();
 
@@ -38,7 +40,7 @@ const MainNavigation = () => {
             return <Icon name="book" size={size} color={color} />;
           },
         }}
-        component={Search}
+        component={LearnScreen}
       />
       <Tab.Screen
         name="Profile"
@@ -48,7 +50,7 @@ const MainNavigation = () => {
             return <Icon name="user" size={size} color={color} />;
           },
         }}
-        component={Search}
+        component={Profile}
       />
     </Tab.Navigator>
   );

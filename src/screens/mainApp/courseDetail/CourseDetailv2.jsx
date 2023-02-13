@@ -478,10 +478,10 @@ const CourseDetailv2 = ({route, navigation}) => {
   const enrollIntoCourse = async () => {
     dispatch(showLoader());
     try {
-      const newSyllabus = course?.syllabus.map(item => {
+      const newSyllabus = course?.syllabus?.map(item => {
         return {
           ...item,
-          child: item?.child.map(childItem => {
+          child: item?.child?.map(childItem => {
             return {
               ...childItem,
               isCompleted: false,
@@ -493,7 +493,7 @@ const CourseDetailv2 = ({route, navigation}) => {
 
       await firestore()
         .collection('progress')
-        .add({courseId: course.id, userId: user.uid, syllabus: newSyllabus});
+        .add({courseId: course.id, userId: user.uid, syllabus: newSyllabus? newSyllabus: [], status:"in-progress"});
       await firestore()
         .collection('courses')
         .doc(payload.id)

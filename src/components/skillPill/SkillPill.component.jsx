@@ -1,13 +1,15 @@
 import React from 'react';
-import {View, Text, StyleSheet} from 'react-native';
+import {View, Text, StyleSheet, TouchableOpacity} from 'react-native';
 import {colors, typography} from '../../styles/theme.style';
 import Icon from 'react-native-vector-icons/Entypo';
 
-const SkillPill = ({skill}) => {
+const SkillPill = ({skill, clickHandler}) => {
   return (
-    <View style={styles.pill}>
+    <TouchableOpacity onPress={()=>{clickHandler(skill)}}>
+      <View style={styles.pill} onPress>
       <Text style={styles.learningText}>{skill}</Text>
     </View>
+    </TouchableOpacity>
   );
 };
 
@@ -20,7 +22,7 @@ const LearningItem = ({learning}) => {
   );
 };
 
-const SkillPillHolder = ({skills = [], supporticons = false}) => {
+const SkillPillHolder = ({skills = [], supporticons = false, clickHandler}) => {
   return (
     <>
       {supporticons && (
@@ -34,7 +36,7 @@ const SkillPillHolder = ({skills = [], supporticons = false}) => {
       {!supporticons && (
         <View style={styles.skillContainer}>
           {skills.map((item, index) => (
-            <SkillPill key={index} skill={item} />
+            <SkillPill key={index} skill={item} clickHandler={clickHandler} />
           ))}
         </View>
       )}
