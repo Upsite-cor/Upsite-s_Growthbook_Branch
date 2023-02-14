@@ -5,7 +5,7 @@ import { typography } from '../../styles/theme.style';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 
 
-const SocialLoginProvider = ({type, onPress = () => {}, loading = false}) => {
+const SocialLoginProvider = ({title,type, onPress = () => {}, loading = false}) => {
   const icons = {
     apple: 'apple',
     google: 'google',
@@ -27,7 +27,7 @@ const SocialLoginProvider = ({type, onPress = () => {}, loading = false}) => {
         {!loading && <Icon size={30} color={colors[type]} name={icons[type]} />}
         {loading && <ActivityIndicator color={colors[type]} />}
         <Text style={[styles.providerText, {color: colors[type]}]}>
-          Continue with {Capitalize(type)}
+          {title}
         </Text>
       </View>
     </TouchableOpacity>

@@ -5,6 +5,7 @@ import auth from '@react-native-firebase/auth';
 import SocialLoginProvider from '../components/authProviders/SocialLoginProvider';
 import { errorMessages } from '../constants/errorCode';
 import { UserContext } from '../navigators/Application';
+import { getProviderButtonTitle } from '../utils';
 
 
 const PROVIDER_ID = 'google.com';
@@ -13,21 +14,35 @@ const Google = () => {
   const [loading, setLoading] = useState(false);
   const user = useContext(UserContext);
 
+  const {isOnlyProvider, title, variant} = getProviderButtonTitle(
+    user,
+    PROVIDER_ID,
+  );
+
   const handleLogin = async () =>{
     if (!loading) {
       setLoading(true);
     try{
-      await GoogleSignin.hasPlayServices();
-      await GoogleSignin.signIn();
-      const {accessToken, idToken} = await GoogleSignin.getTokens();
-      const credential = auth.GoogleAuthProvider.credential(
-        idToken,
-        accessToken,
-      );
-      await auth().signInWithCredential(credential);
+      if (variant === 'UNLINK' && user) {
+        await user.unlink(PROVIDER_ID);
+        await user.reload();}else{
+          await GoogleSignin.hasPlayServices();
+          await GoogleSignin.signIn();
+          const {accessToken, idToken} = await GoogleSignin.getTokens();
+          const credential = auth.GoogleAuthProvider.credential(
+            idToken,
+            accessToken,
+          );
+          if (variant === 'LINK' && user) {
+            await user.linkWithCredential(credential);
+            await user.reload();
+          } else if (variant === 'SIGN_IN') {
+            await auth().signInWithCredential(credential);
+          }
+        }
+      
     }
     catch(e){
-      setLoading(false);
       const error = e;
       switch (error.code) {
         case statusCodes.SIGN_IN_CANCELLED:
@@ -71,6 +86,7 @@ const Google = () => {
           }
         }
       }
+      setLoading(false);
 
     }
   }
@@ -84,6 +100,7 @@ const Google = () => {
   }, []);
     return (
         <SocialLoginProvider
+        title={title}
         loading={loading}
         onPress={handleLogin}
         type={"google"}></SocialLoginProvider>

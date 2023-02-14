@@ -9,6 +9,7 @@ import appleAuth, {
   AppleRequestOperation,
   AppleRequestScope,
 } from '@invertase/react-native-apple-authentication';
+import { getProviderButtonTitle } from '../utils';
 
 const PROVIDER_ID = 'apple.com';  
 const Apple = () => {
@@ -18,28 +19,39 @@ const Apple = () => {
     return null;
   }
 
+  const {isOnlyProvider, variant,title} = getProviderButtonTitle(user, PROVIDER_ID);
+
   const handleLogin = async () =>{
     if (!loading) {
       setLoading(true);
       try {
-        const appleAuthRequestResponse = await appleAuth.performRequest({
-          requestedOperation: appleAuth.Operation.LOGIN,
-    requestedScopes: [appleAuth.Scope.EMAIL, appleAuth.Scope.FULL_NAME],
-        }); 
-
-        const {identityToken, nonce} = appleAuthRequestResponse;
-        if (identityToken) {
-          const credential = auth.AppleAuthProvider.credential(
-            identityToken,
-            nonce,
-          );
-
-          await auth().signInWithCredential(credential);
+        if (variant === 'UNLINK' && user) {
+          await user.unlink(PROVIDER_ID);
+          await user.reload();
         } else {
-          Alert.alert(errorMessages["appleAuthErrorTitle"], errorMessages["appleAuthErrorMessage"]);
+          const appleAuthRequestResponse = await appleAuth.performRequest({
+            requestedOperation: appleAuth.Operation.LOGIN,
+        requestedScopes: [appleAuth.Scope.EMAIL, appleAuth.Scope.FULL_NAME],
+          }); 
+        
+          const {identityToken, nonce} = appleAuthRequestResponse;
+          if (identityToken) {
+            const credential = auth.AppleAuthProvider.credential(
+              identityToken,
+              nonce,
+            );
+        
+            if (variant === 'LINK' && user) {
+              await user.linkWithCredential(credential);
+              await user.reload();
+            } else if (variant === 'SIGN_IN') {
+              await auth().signInWithCredential(credential);
+            }
+          } else {
+            Alert.alert(errorMessages["appleAuthErrorTitle"], errorMessages["appleAuthErrorMessage"]);
+          }
         }
       } catch (e) {
-        setLoading(false);
         console.log(e.message);
         const error = e;
         if (error.code !== '1001') {
@@ -47,11 +59,16 @@ const Apple = () => {
           // TODO: translate all possible cases - just sending through raw now
         }
       }
+      setLoading(false);
     }
 
   }
+  if (isOnlyProvider) {
+    return null;
+  }
     return (
         <SocialLoginProvider
+        title={title}
         onPress={handleLogin}
         loading={loading}
         type={"apple"}></SocialLoginProvider>

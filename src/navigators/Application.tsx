@@ -44,11 +44,11 @@ const ApplicationNavigator = () => {
   /** Listen for user changes */
   useEffect(() => {
     let userListener: () => void;
-
+    
     if (listenUser) {
       // TODO @react-native-firebase/auth provides `onUserChanged` which is this and more.
       // what else can we add and still be web-compatible?
-      userListener = auth().onIdTokenChanged(result => {
+      userListener = auth().onUserChanged(result => {
         setUser(result);
         dispatch(updateUserId(result?.uid));
       });
