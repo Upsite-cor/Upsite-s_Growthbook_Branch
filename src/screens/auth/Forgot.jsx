@@ -22,31 +22,27 @@ import {useDispatch} from 'react-redux';
 import {hideLoader, showLoader} from '../../features/loader/loaderSlice';
 import * as yup from 'yup';
 
-const LoginWithEmail = ({navigation}) => {
+const Forgot = ({navigation}) => {
   const loginValidationSchema = yup.object().shape({
     email: yup
       .string()
       .email('Please enter valid email')
-      .required('Email Address is Required'),
-    password: yup
-      .string()
-      .min(6, ({min}) => `Password must be at least ${min} characters`)
-      .required('Password is required'),
+      .required('Email Address is Required')
   });
 
   const dispatch = useDispatch();
 
   const handleLogin = async values => {
-    if (!values?.email || !values?.password) {
+    if (!values?.email) {
       return;
     }
 
     try {
       dispatch(showLoader());
-      await auth()
-        .signInWithEmailAndPassword(values?.email, values?.password)
+      await auth().sendPasswordResetEmail(values.email)
         .then(() => {
           dispatch(hideLoader());
+          navigation.goBack();
         });
     } catch (e) {
       dispatch(hideLoader());
@@ -62,7 +58,7 @@ const LoginWithEmail = ({navigation}) => {
   return (
     <View style={{flex: 1}}>
       <Container>
-        <Header title={'Login to your account.'}></Header>
+        <Header title={'Reset your password.'}></Header>
         <View style={{gap: 15, marginTop: 55}}>
           <Formik
             validationSchema={loginValidationSchema}
@@ -87,35 +83,11 @@ const LoginWithEmail = ({navigation}) => {
                     onBlur={handleBlur('email')}
                     value={values.email}
                   />
-                <View>
-                  <Field
-                    name="password"
-                    placeholder="Password"
-                    error={errors.password}
-                    style={styles.textInput}
-                    onChangeText={handleChange('password')}
-                    onBlur={handleBlur('password')}
-                    value={values.password}
-                    secureTextEntry
-                  />
-                  <Button
-                  onPress={()=> {navigation.navigate("forgot")}}
-                    innerStyle={styles.forgot}
-                    type="outline"
-                    title="Forgot your password?"
-                  />
-                </View>
-                <Button onPress={handleSubmit} title="Login" />
+                <Button onPress={handleSubmit} title="Reset" />
               </>
             )}
           </Formik>
         </View>
-        <Button
-          onPress={() => navigation.replace('signUp')}
-          style={{marginTop: 15}}
-          title={'New to Growthboook? Create Account'}
-          type={'outline'}
-        />
       </Container>
       <TermOfService />
     </View>
@@ -165,4 +137,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default LoginWithEmail;
+export default Forgot;

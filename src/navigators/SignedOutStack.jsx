@@ -2,7 +2,7 @@ import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import Login from '../screens/auth/Login';
 import LoginWithEmail from '../screens/auth/LoginEmail';
 import Signup from '../screens/auth/Signup';
-
+import Forgot from '../screens/auth/Forgot'
 const Stack = createNativeStackNavigator();
 
 const SignedOutStack = () =>{
@@ -17,6 +17,11 @@ const SignedOutStack = () =>{
             name="loginEmail"
             options={{headerShown: false}}
             component={LoginWithEmail}
+          />
+             <Stack.Screen
+            name="forgot"
+            options={{headerShown: false}}
+            component={Forgot}
           />
           <Stack.Screen
             name="signUp"
