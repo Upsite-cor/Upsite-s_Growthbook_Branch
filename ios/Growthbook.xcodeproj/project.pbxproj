@@ -641,6 +641,7 @@
 				ENABLE_BITCODE = NO;
 				EXCLUDED_ARCHS = i386;
 				INFOPLIST_FILE = Growthbook/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = "Growth Book App";
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.education";
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
@@ -672,6 +673,7 @@
 				DEVELOPMENT_TEAM = 9YT8DYHF2D;
 				EXCLUDED_ARCHS = i386;
 				INFOPLIST_FILE = Growthbook/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = "Growth Book App";
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.education";
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
