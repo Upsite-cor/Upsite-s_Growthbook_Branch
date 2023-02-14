@@ -43,6 +43,7 @@
 		B5E4C9E33B7E46DEB3528D3F /* SourceSansPro-Bold.ttf in Resources */ = {isa = PBXBuildFile; fileRef = C758A549E38F4602B3B28474 /* SourceSansPro-Bold.ttf */; };
 		C3393FA2B5954EC6993C4BE2 /* SourceSansPro-Regular.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 4EBE86C5A0D74177AF8640F7 /* SourceSansPro-Regular.ttf */; };
 		CF8067D3887E40F892F9BFBD /* SourceSansPro-ExtraLight.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 147190B558E84FC99B832B66 /* SourceSansPro-ExtraLight.ttf */; };
+		F0730813299B1663004F8901 /* AppCenter-Config.plist in Resources */ = {isa = PBXBuildFile; fileRef = F0730812299B1663004F8901 /* AppCenter-Config.plist */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -103,6 +104,7 @@
 		C758A549E38F4602B3B28474 /* SourceSansPro-Bold.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = "SourceSansPro-Bold.ttf"; path = "../src/assets/fonts/SourceSansPro-Bold.ttf"; sourceTree = "<group>"; };
 		ED297162215061F000B7C4FE /* JavaScriptCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = JavaScriptCore.framework; path = System/Library/Frameworks/JavaScriptCore.framework; sourceTree = SDKROOT; };
 		F0730811299B0247004F8901 /* GrowthbookDebug.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; name = GrowthbookDebug.entitlements; path = Growthbook/GrowthbookDebug.entitlements; sourceTree = "<group>"; };
+		F0730812299B1663004F8901 /* AppCenter-Config.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "AppCenter-Config.plist"; sourceTree = "<group>"; };
 		F0FF60589CDC4480BDEE4521 /* SourceSansPro-LightItalic.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = "SourceSansPro-LightItalic.ttf"; path = "../src/assets/fonts/SourceSansPro-LightItalic.ttf"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -155,6 +157,7 @@
 				81AB9BB72411601600AC10FF /* LaunchScreen.storyboard */,
 				13B07FB71A68108700A75B9A /* main.m */,
 				1D20006829760BEC009AF5C3 /* Growthbook-Bridging-Header.h */,
+				F0730812299B1663004F8901 /* AppCenter-Config.plist */,
 			);
 			name = Growthbook;
 			sourceTree = "<group>";
@@ -363,6 +366,7 @@
 				4AADBF0F20134353A0E4EFC6 /* SourceSansPro-ExtraLightItalic.ttf in Resources */,
 				90F49ACB501644F2B9D86BE6 /* SourceSansPro-Italic.ttf in Resources */,
 				1D2243CE2979F3D300278AA6 /* EvilIcons.ttf in Resources */,
+				F0730813299B1663004F8901 /* AppCenter-Config.plist in Resources */,
 				1D2243DA2979F3D300278AA6 /* Fontisto.ttf in Resources */,
 				57A5A15D3C6B4D3E866A518E /* SourceSansPro-Light.ttf in Resources */,
 				3145FEE7C7594EADA401AC81 /* SourceSansPro-LightItalic.ttf in Resources */,
