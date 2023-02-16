@@ -56,9 +56,9 @@ const providerNames = {
 };
 
 const providerTitles= {
-  SIGN_IN: 'Continue in with',
-  LINK: 'Link',
-  UNLINK: 'Unlink',
+  SIGN_IN: 'Continue with',
+  LINK: 'Sign in with',
+  UNLINK: 'Disconnect',
 };
 
 /**

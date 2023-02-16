@@ -20,6 +20,9 @@ const Apple = () => {
   }
 
   const {isOnlyProvider, variant,title} = getProviderButtonTitle(user, PROVIDER_ID);
+  if (variant === 'UNLINK' && user) {
+    return null;
+  }
 
   const handleLogin = async () =>{
     if (!loading) {
