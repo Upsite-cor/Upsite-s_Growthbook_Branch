@@ -19,6 +19,7 @@ import { getCredentialsForUser } from '../../utils';
 import Apple from '../../authProviders/Apple';
 import Google from '../../authProviders/Google';
 import Facebook from '../../authProviders/Facebook';
+import firestore from '@react-native-firebase/firestore';
 
 const ImageShower = ({ src }) => {
   const [isLoading, setIsLoading] = useState(true);
@@ -107,6 +108,56 @@ const Profile = () => {
       }
     });
   }
+  const deleteAccount = async (pass) =>{
+    dispatch(showLoader());
+
+    var existingCredential = getCredentialsForUser(user, pass);
+    try {
+      await user.reauthenticateWithCredential(existingCredential);
+    }
+    catch(e){
+      Alert.e("Incorrect password entered");
+      return;
+    }
+  
+    const quizAttemptRef = firestore().collection("quizAttempts").where("userId", "==", user.uid);
+    const progressRef = firestore().collection("progress").where("userId", "==", user.uid);
+    const coursesRef = firestore().collection('courses');
+    const courseQuery = coursesRef.where('enrollments', 'array-contains', user.uid);
+    
+    const batch = firestore().batch();
+  
+    const quizAttemptSnapshot = await quizAttemptRef.get();
+    const progressSnapshot = await progressRef.get();
+    const coursesSnapshot = await courseQuery.get();
+  
+    quizAttemptSnapshot.forEach(documentSnapshot => {
+      batch.delete(documentSnapshot.ref);
+    });
+  
+    progressSnapshot.forEach(documentSnapshot => {
+      batch.delete(documentSnapshot.ref);
+    });
+  
+    coursesSnapshot.forEach((courseDoc) => {
+      const courseRef = coursesRef.doc(courseDoc.id);
+      batch.update(courseRef, {
+        enrollments: firestore.FieldValue.arrayRemove(user.uid),
+      });
+    });
+  
+    try {
+      await batch.commit();
+      await user.delete();
+      console.log('Batch write operation completed successfully.');
+    } catch (error) {
+      console.log('Transaction failed: ', error);
+    }
+  
+    dispatch(hideLoader());
+  }
+  
+  
   const updatePassword = async (values, resetForm) => {
     dispatch(showLoader());
     try {
@@ -123,7 +174,7 @@ const Profile = () => {
 
       } else {
         var existingCredential = getCredentialsForUser(user);
-        // await user.reauthenticateWithCredential(existingCredential);
+        await user.reauthenticateWithCredential(existingCredential);
         // console.log("Umer", existingCredential);
         const credential = auth.EmailAuthProvider.credential(user.email, values.password);
         await user.linkWithCredential(credential);
@@ -133,6 +184,17 @@ const Profile = () => {
       Alert.alert("An error occured", E.message);
     }
     resetForm(intialPassValue);
+    dispatch(hideLoader());
+  }
+  resetPassword = async (value)=>{
+    dispatch(showLoader());
+    try{
+      await auth().sendPasswordResetEmail(value);
+      Alert.alert("Check your email", "An email was sent to your email address to reset your password");
+      await auth().signOut();
+    }catch(e){
+      Alert.alert("An error occurred", "Invalid/Incorrect email address added.");
+    }
     dispatch(hideLoader());
   }
   const handleCreate = async values => {
@@ -185,7 +247,7 @@ const Profile = () => {
                   <Text style={{ fontWeight: 400, fontSize: 16, fontFamily: typography.fontFamilies.PRIMARY, color: colors.font.PRIMARY }}>Basic Info</Text>
                   <Formik
                     validationSchema={signupValidationSchema}
-                    initialValues={{ fullName: user.displayName, email: user.email }}
+                    initialValues={{ fullName: user.displayName ?? '', email: user.email }}
                     onSubmit={handleCreate}>
                     {({
                       handleChange,
@@ -241,61 +303,63 @@ const Profile = () => {
                     // marginVertical:,
                   }}
                 />
-                <View style={{ justifyContent: "flex-start", width: "100%", marginVertical: 10 }}>
-                  <Text style={{ fontWeight: 400, fontSize: 16, fontFamily: typography.fontFamilies.PRIMARY, color: colors.font.PRIMARY }}>Update Password</Text>
-                  <Formik
-                    initialValues={intialPassValue}
-                    onSubmit={(values, { resetForm }) => {
-                      updatePassword(values, resetForm)
-                    }}
-                    validationSchema={passwordValidationSchema}>
-                    {({
-                      handleChange,
-                      handleBlur,
-                      handleSubmit,
-                      values,
-                      errors,
-                      isValid,
-                    }) => (
-                      <>
-                        {user.providerData.map(provider => provider.providerId).includes("password") && <Field
-                          name="existingPassword"
-                          error={errors.existingPassword}
-                          placeholder="Existing Password"
-                          style={styles.textInput}
-                          onChangeText={handleChange('existingPassword')}
-                          onBlur={handleBlur('existingPassword')}
-                          value={values.existingPassword}
-                          secureTextEntry
-                        />}
-                        <Field
-                          secureTextEntry
-                          name="password"
-                          placeholder="New Password"
-                          style={styles.textInput}
-                          error={errors.password}
-                          onChangeText={handleChange('password')}
-                          onBlur={handleBlur('password')}
-                          value={values.password}
-                        />
-                        <Field
-                          secureTextEntry
-                          name="confirmPassword"
-                          placeholder="Confirm New Password"
-                          style={styles.textInput}
-                          error={errors.confirmPassword}
-                          onChangeText={handleChange('confirmPassword')}
-                          onBlur={handleBlur('confirmPassword')}
-                          value={values.confirmPassword}
-                        />
-                        {/* <View>
-                 
-                </View> */}
-                        <Button onPress={handleSubmit} title="Update Password" />
-                      </>
-                    )}
-                  </Formik>
-                </View>
+               {user.providerData.map(provider => provider.providerId).includes("password")
+                &&  <View style={{ justifyContent: "flex-start", width: "100%", marginVertical: 10 }}>
+                <Text style={{ fontWeight: 400, fontSize: 16, fontFamily: typography.fontFamilies.PRIMARY, color: colors.font.PRIMARY }}>Update Password</Text>
+                <Formik
+                  initialValues={intialPassValue}
+                  onSubmit={(values, { resetForm }) => {
+                    updatePassword(values, resetForm)
+                  }}
+                  validationSchema={passwordValidationSchema}>
+                  {({
+                    handleChange,
+                    handleBlur,
+                    handleSubmit,
+                    values,
+                    errors,
+                    isValid,
+                  }) => (
+                    <>
+                      {user.providerData.map(provider => provider.providerId).includes("password") && <Field
+                        name="existingPassword"
+                        error={errors.existingPassword}
+                        placeholder="Existing Password"
+                        style={styles.textInput}
+                        onChangeText={handleChange('existingPassword')}
+                        onBlur={handleBlur('existingPassword')}
+                        value={values.existingPassword}
+                        secureTextEntry
+                      />}
+                      <Field
+                        secureTextEntry
+                        name="password"
+                        placeholder="New Password"
+                        style={styles.textInput}
+                        error={errors.password}
+                        onChangeText={handleChange('password')}
+                        onBlur={handleBlur('password')}
+                        value={values.password}
+                      />
+                      <Field
+                        secureTextEntry
+                        name="confirmPassword"
+                        placeholder="Confirm New Password"
+                        style={styles.textInput}
+                        error={errors.confirmPassword}
+                        onChangeText={handleChange('confirmPassword')}
+                        onBlur={handleBlur('confirmPassword')}
+                        value={values.confirmPassword}
+                      />
+                      {/* <View>
+               
+              </View> */}
+                      <Button onPress={handleSubmit} title="Update Password" />
+                    </>
+                  )}
+                </Formik>
+              </View>
+               }
               </View>
               <View
                   style={{
@@ -312,6 +376,23 @@ const Profile = () => {
                   <Google />
                   <Facebook />
                 </View>
+                <Button onPress={()=>{
+                  Alert.alert("Are you sure you want to delete your account?","This action cannot be undone.", [{text:"Cancel",isPreferred: true, style:"cancel"},{text:"Delete", style:"destructive", onPress: ()=>{
+                    if (user.providerData.map(provider => provider.providerId).includes("password")) {
+                        Alert.prompt("Confirm your identity",'Login Credentials', [{text:"Cancel",isPreferred: true, style:"cancel"},{text:"Confirm", style:"destructive", onPress: (value)=>{
+                          if(value.login!=user.email){
+                            Alert.alert("Incorrect Email Address");
+                          }else{
+                            deleteAccount(value.password)
+                          }
+                        }}], "login-password","","secure-text")
+                    }else{
+                      Alert.prompt("Reset your passowrd", "Your account was created using a social login. Please enter your email addresss to reset the password.", [{text:"Cancel",isPreferred: true, style:"cancel"},{text:"Confirm", style:"destructive", onPress: (value)=>{
+                        resetPassword(value)
+                      }}],"plain-text", "", "email-address")
+                    }
+                  }}])
+                }} title="Delete Account"></Button>
               <Button type="outline" title={"Log out"} onPress={() => auth()
                 .signOut()
                 .then(() => console.log('User signed out!'))}></Button>
