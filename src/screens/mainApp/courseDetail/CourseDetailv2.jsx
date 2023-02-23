@@ -101,7 +101,7 @@ const CourseDetailv2 = ({route, navigation}) => {
           onPress={() => navigation.goBack()}
           icon={'chevron-back'}
         />
-        <HeaderButton icon={'heart-outline'} />
+        {/* <HeaderButton icon={'heart-outline'} /> */}
       </View>
     );
   };
@@ -125,7 +125,7 @@ const CourseDetailv2 = ({route, navigation}) => {
   const headerTitleStyle = null;
   const alwaysShowTitle = true;
   const renderNavBar = navBarActions;
-  const tabs = ['Description', 'Syllabus', 'Reviews'];
+  const tabs = ['Description', 'Syllabus'];
 
   const scrollY = new Animated.Value(0);
 

@@ -76,7 +76,7 @@ export const HomeScreen = ({navigation}) => {
       <SearchButton clickHandler={()=> {navigation.navigate("Search")}}/>
       <MarketingSlideContainer />
       <ActionHeader heading={'Categories'} />
-      <CategoryBox categories={pills} />
+      <CategoryBox categories={pills} clickHandler={(cat)=>{ navigation.navigate("courseListing", {type:"category",payload: {item: cat}});}}/>
       <ActionHeader heading={'Latest Courses'} />
       <CourseList courses={latestCourses} clickHandler={courseOpened} />
       <ActionHeader heading={'Popular Courses'} />
