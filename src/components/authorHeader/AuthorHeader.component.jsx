@@ -1,11 +1,12 @@
 import React from 'react';
 import { View, Image, StyleSheet, Text } from 'react-native';
 import { colors, typography } from '../../styles/theme.style';
+import emptyUser from '../../assets/images/emptyUser.png';
 
 const AuthorHeader = ({author}) => {
   return (
     <View style={styles.container}>
-        <Image style={styles.image} source={{uri: author?.profilePic}}/>
+        <Image style={styles.image} source={author?.profilePic? {uri: author?.profilePic}: emptyUser}/>
         <Text style={styles.text}>{author?.name}</Text>
     </View>
   )

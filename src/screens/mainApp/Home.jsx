@@ -35,7 +35,7 @@ const reducer = (state, action)=> {
   }
 }
 
-export const HomeScreen = ({navigation}) => {
+const Home = ({navigation}) => {
   const {fontScale} = useWindowDimensions();
   const styles = getScaledStyles(fontScale);
   const [state, dispatch] = useReducer(reducer, initialState);
@@ -124,3 +124,5 @@ const getScaledStyles = fontScale =>{
       }
   })
 }
+
+export default Home;

@@ -1,6 +1,6 @@
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import AudioApp from '../screens/player/AudioApp';
-import CourseDetailv2 from '../screens/mainApp/courseDetail/CourseDetailv2';
+import CourseDetailv2 from '../screens/mainApp/Course';
 import CourseNavigation from '../screens/mainApp/CourseNavigation';
 import MainNavigation from './Main';
 import LectureViewer from '../screens/mainApp/LectureViewer';
