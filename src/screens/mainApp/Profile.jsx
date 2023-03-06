@@ -14,11 +14,11 @@ import CourseCardStylesheet from "../../components/home/courseCardv2/CourseCardv
 import errorImage from '../../assets/images/errorImage.png';
 import { Formik } from 'formik';
 import * as yup from 'yup';
-import Field from '../../components/form/Field.component';
+import Field from '../../components/forms/Field.component';
 import { getCredentialsForUser } from '../../utils';
-import Apple from '../../authProviders/Apple';
-import Google from '../../authProviders/Google';
-import Facebook from '../../authProviders/Facebook';
+import Apple from '../../components/authProviders/molecules/Apple';
+import Google from '../../components/authProviders/molecules/Google';
+import Facebook from '../../components/authProviders/molecules/Facebook';
 import firestore from '@react-native-firebase/firestore';
 
 const ImageShower = ({ src }) => {

@@ -106,18 +106,18 @@ export const errorMessages = {
     'registration-error': 'Registration Error',
     'user-created': 'User Registered',
     'user-created-message': 'New user account registered successfully',
-    'change-password-email': 'Password Reset Link Sent',
-    'change-password-email-message':
+    passwordResetEmailSent: 'Password Reset Link Sent',
+    passwordResetEmailSentMessage:
       'We have successfully sent a password reset link to your address. Please check your email to change your password, then try to login again.',
     'change-password-email-error': 'Password Reset Email Error',
     'change-password-email-error-message':
       'There was an error sending the email to reset your password. Please check the address and try again.',
-    'change-password-error': 'Password Reset Error',
+    resetPasswordError: 'Password Reset Error',
     'change-password-successful': 'Password Change Successful',
     'change-password-successful-message':
       'You have successfully changed your password.',
     'logout-error': 'Logout Error',
-    'login-error': 'Login Error',
+    loginError: 'Login Error',
     'email-send': 'Verification Email Sent',
     'email-send-message': 'A new verification link was sent to your email',
     'email-send-error': 'Error Verifying Email',

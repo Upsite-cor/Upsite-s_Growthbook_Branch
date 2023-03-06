@@ -1,89 +1,126 @@
-import React, {useEffect, useState} from 'react';
-import {Text, View, Image, Alert} from 'react-native';
-import growthbookLogo2 from '../../assets/images/growthbookLogo-2.png';
-import globalStylesheet from '../../styles/global.style';
-import homeScreenStylesheet from './HomeScreen.style';
-import Container from '../../components/layout/container/Container.component';
+import React, {useEffect, useReducer} from 'react';
+import {Text, View, StyleSheet, useWindowDimensions, ActivityIndicator} from 'react-native';
+import Categories from '../../components/pills/molecules/Categories';
+import ActionHeader from '../../components/headers/ActionHeader.component';
+import SearchButton from '../../components/button/SearchButton.component';
+import CourseList from '../../components/cards/molecules/CourseList.component';
+import MarketingSlideContainer from '../../components/cards/organisms/MarketingSlides';
+import Container from '../../components/layout/container/Container2.component';
+import AuthHeader from '../../components/headers/AuthHeader.component';
+import { colors, layout, typography } from '../../styles/theme.style';
+import Refresh from '../../components/layout/Refresh.component';
+import CategoriesService from '../../services/categories/Categories.service';
+import CourseService from '../../services/courses/Course.service';
 
-import CategoryBox from '../../components/home/categoryList/CategoryList.component';
-import ActionHeader from '../../components/layout/actionHeader/ActionHeader.component';
-import SearchButton from '../../components/home/searchButton/SearchButton.component';
-import CourseList from '../../components/home/courseList/CourseList.component';
-import MarketingSlideContainer from '../../components/home/marketingSlideContainer/MarketingSlideContainer.component';
-import {useDispatch} from 'react-redux';
-import {hideLoader, showLoader} from '../../features/loader/loaderSlice';
-import firestore from '@react-native-firebase/firestore';
+const initialState = {refreshing: false, categories:[], latestCourses:[], categoriesLoading: true, latestCoursesLoading: true };
+
+const reducer = (state, action)=> {
+  switch (action.type) {
+    case 'SHOW_REFRESHER':
+      return {...state, refreshing:true};
+    case 'HIDE_REFRESHER':
+      return {...state, refreshing: false};
+    case 'SHOW_ALL_LOADERS':
+      return { ...state,  categoriesLoading: true, latestCoursesLoading: true };
+    case 'SET_CATEGORIES':
+      return { ...state, categoriesLoading: false, categories: action.payload };
+    case 'SET_COURSES':
+      return { ...state, latestCoursesLoading: false, latestCourses: action.payload };
+    case 'HIDE_CAT_LOADER':
+      return { ...state, categoriesLoading: false, categories: []};
+    case 'HIDE_COURSE_LOADER':
+      return { ...state, latestCoursesLoading: false, latestCourses: []};
+    default:
+      return state;
+  }
+}
 
 export const HomeScreen = ({navigation}) => {
-  const [pills, setPills] = useState([]);
-  const [latestCourses, setLatestCourses] = useState([]);
-  const dispatch = useDispatch();
+  const {fontScale} = useWindowDimensions();
+  const styles = getScaledStyles(fontScale);
+  const [state, dispatch] = useReducer(reducer, initialState);
+
+  const _getRefreshControl =()=>{
+    return(
+      <Refresh refreshing={state.refreshing} onRefresh={refreshContent}/>
+    )
+  }
+
+  const refreshContent = async () =>{
+    dispatch({type: "SHOW_REFRESHER"});
+    await fetchData();
+    dispatch({type: "HIDE_REFRESHER"});
+  }
 
   const fetchCategories = async () => {
-    let list = [];
-    try {
-      const collection = await firestore()
-        .collection('categories')
-        .limit(5)
-        .get();
-      collection.forEach(documentSnapshot => {
-        list.push({...documentSnapshot.data(), id: documentSnapshot.id});
-      });
-    } catch (e) {}
-    return list;
+    try{ 
+      var categories =  await CategoriesService.getAll();
+      dispatch({ type: 'SET_CATEGORIES', payload: categories });
+    }catch(e){
+      dispatch({ type: 'HIDE_CAT_LOADER', payload: courses });
+    }
   };
 
   const fetchCourses = async () => {
-    let list = [];
-    try {
-      const collection = await firestore().collection('courses').limit(3).get();
-      collection.forEach(documentSnapshot => {
-        list.push({...documentSnapshot.data(), id: documentSnapshot.id});
-      });
-    } catch (e) {}
-    return list;
+    try{
+      var courses =  await CourseService.getLatestCourses();
+      dispatch({ type: 'SET_COURSES', payload: courses });
+    }catch(e){
+      dispatch({ type: 'HIDE_COURSE_LOADER', payload: courses });
+    }
   };
 
-  useEffect(() => {
-    const unsubscribe = navigation.addListener('focus', async () => {
-      dispatch(showLoader());
-      try {
-        const cetegories = await fetchCategories();
-        const courses = await fetchCourses();
-        setPills(cetegories);
-        setLatestCourses(courses);
-      } catch (e) {
-        Alert.alert(error.message);
-      } finally {
-        dispatch(hideLoader());
+  const fetchData = async () =>{
+      try{
+        dispatch({ type: 'SHOW_ALL_LOADERS'});
+        await fetchCategories();
+        await fetchCourses();
       }
-    });
+      catch(error){}
+  }
 
-    // Return the function to unsubscribe from the event so it gets removed on unmount
-    return unsubscribe;
-  }, [navigation]);
+  useEffect(()=>{
+    fetchData();
+  },[])
 
   const courseOpened = course => {
     navigation.navigate('course', {payload: course});
   };
 
   return (
-    <Container>
-      <View style={[globalStylesheet.centered, homeScreenStylesheet.logo]}>
-        <Image style={{width: 218, height: 45}} source={growthbookLogo2} />
+    <Container scrollViewBounce={true} refreshControl={_getRefreshControl()}>
+      <View style={{flex:1, paddingHorizontal: layout.padding.HORIZONTAL, gap: layout.gap.NEIGHBORS}}>
+        <AuthHeader />
+        <Text style={styles.heading}>Explore</Text>
+        <SearchButton clickHandler={()=> {navigation.navigate("Search")}}/>
+        <MarketingSlideContainer />
+        <ActionHeader heading={'Categories'} />
+        <View>
+          {state.categoriesLoading && <ActivityIndicator />}
+          {!state.categoriesLoading && <Categories categories={state.categories} clickHandler={(cat)=>{ navigation.navigate("courseListing", {type:"category",payload: {item: cat}});}}/>}
+        </View>
+        <ActionHeader heading={'Latest Courses'} />
+        <View>
+          {state.latestCoursesLoading && <ActivityIndicator />}
+          {!state.latestCoursesLoading && <CourseList courses={state.latestCourses} clickHandler={courseOpened} />}
+        </View>
+        <ActionHeader heading={'Popular Courses'} />
+        <View>
+        {state.latestCoursesLoading && <ActivityIndicator />}
+          {!state.latestCoursesLoading && <CourseList  courses={[...state.latestCourses.slice().reverse()]} clickHandler={courseOpened} />}
+        </View>
       </View>
-      <Text style={globalStylesheet.heading}>Explore</Text>
-      <SearchButton clickHandler={()=> {navigation.navigate("Search")}}/>
-      <MarketingSlideContainer />
-      <ActionHeader heading={'Categories'} />
-      <CategoryBox categories={pills} clickHandler={(cat)=>{ navigation.navigate("courseListing", {type:"category",payload: {item: cat}});}}/>
-      <ActionHeader heading={'Latest Courses'} />
-      <CourseList courses={latestCourses} clickHandler={courseOpened} />
-      <ActionHeader heading={'Popular Courses'} />
-      <CourseList
-        courses={[...latestCourses.slice().reverse()]}
-        clickHandler={courseOpened}
-      />
     </Container>
   );
 };
+
+const getScaledStyles = fontScale =>{
+  return StyleSheet.create({
+      heading:{
+        fontFamily: typography.fontFamilies.PRIMARY,
+        fontSize: typography.fontSizes.FONT_SIZE_LARGE/fontScale,
+        fontWeight: typography.fontWights.BOLD,
+        color: colors.font.PRIMARY,
+      }
+  })
+}
