@@ -1,92 +1,153 @@
-import React, { useContext, useState } from 'react'
-import Button from '../../components/button/Button.component'
-import Container from '../../components/layout/container/Container.component'
 import auth from '@react-native-firebase/auth';
-import BackHeader from '../../components/navigation/organisms/BackHeader';
-import { UserContext } from '../../navigators/Application';
-import { ActivityIndicator, Alert, Image, KeyboardAvoidingView, Platform, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
-import { colors, typography } from '../../styles/theme.style';
-import storage from '@react-native-firebase/storage';
-import { launchImageLibrary } from 'react-native-image-picker';
-import { useDispatch } from 'react-redux';
-import { hideLoader, showLoader } from '../../features/loader/loaderSlice';
-import CourseCardStylesheet from "../../components/home/courseCardv2/CourseCardv2.component.style";
-import errorImage from '../../assets/images/errorImage.png';
-import { Formik } from 'formik';
-import * as yup from 'yup';
-import Field from '../../components/forms/Field.component';
-import { getCredentialsForUser } from '../../utils';
-import Apple from '../../components/authProviders/molecules/Apple';
-import Google from '../../components/authProviders/molecules/Google';
-import Facebook from '../../components/authProviders/molecules/Facebook';
-import firestore from '@react-native-firebase/firestore';
+import React, { useContext, useState } from "react";
+import { Platform, StyleSheet, Text, TextInput, TouchableOpacity, useWindowDimensions, View } from "react-native";
+import { launchImageLibrary } from "react-native-image-picker";
+import { useDispatch } from "react-redux";
+import SocialLogin from "../../components/authProviders/organisms/SocialLogin.component";
+import Button from "../../components/buttons/Button2.component";
+import Form from "../../components/forms/Form.component";
+import BackHeader from "../../components/headers/BackHeader.component";
+import ContentHeader from "../../components/headers/ContentHeader.component";
+import Container from "../../components/layout/Container2.component";
+import ImageWrapper from "../../components/wrappers/ImageWrapper.component";
+import { hideLoader, showLoader } from "../../features/loader/loaderSlice";
+import { UserContext } from "../../navigators/Application";
+import { ProfileService } from "../../services/auth/Profile.service";
+import { colors, layout, typography } from "../../styles/theme.style";
+import { getCredentialsForUser } from "../../utils";
+import Alert from "../../utils/alert";
+import { Alert as NativeAlert } from 'react-native';
+import PasswordResetValidator from "../../validators/auth/PasswordReset.validator";
+import ProfileValidator from "../../validators/auth/Profile.validator";
 
-const ImageShower = ({ src }) => {
-  const [isLoading, setIsLoading] = useState(true);
-  const [isError, setIsError] = useState(false);
-
-
-  const handleLoaded = () => {
-    // setIsLoading(false);
-  };
-  const handleError = () => {
-    setIsLoading(false);
-    setIsError(true);
-  };
-
-  return (<View style={[CourseCardStylesheet.imageContainer, { borderRadius: 50 }]}>
-    {isLoading && <ActivityIndicator style={CourseCardStylesheet.activityLoader} />}
-    {!isError && <Image onError={handleError} onLoadEnd={handleLoaded} style={[CourseCardStylesheet.image, { borderRadius: 50 }]} source={{ uri: src }} />}
-    {isError && <Image style={[CourseCardStylesheet.image, { borderRadius: 50 }]} source={errorImage} />}
-  </View>)
+const LineBreak = () => {
+  return (
+    <View
+      style={{
+        borderBottomColor: colors.general.BACKGROUND,
+        borderBottomWidth: 1,
+        width: '100%',
+      }}
+    />
+  )
 }
 
 const Profile = () => {
-  const passwordValidationSchema = yup.object().shape({
-    existingPassword: yup.string(),
-    password: yup.string()
-      .required('Please enter a new password')
-      .min(8, 'Password must be at least 8 characters long'),
-    confirmPassword: yup.string()
-      .required('Please confirm your new password')
-      .oneOf([yup.ref('password'), null], 'Passwords must match'),
-  });
-  const signupValidationSchema = yup.object().shape({
-    fullName: yup
-      .string()
-      .min(3, ({ min }) => `Name must be at least ${min} characters`)
-      .required('Name is required'),
-    email: yup
-      .string()
-      .email('Please enter valid email')
-      .required('Email Address is Required'),
-    // password: yup
-    //   .string()
-    //   .min(8, ({min}) => `Password must be at least ${min} characters`)
-    //   .required('Password is required'),
-  });
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
   const user = useContext(UserContext);
-  const intialPassValue = { existingPassword: '', password: '', confirmPassword: '' };
+  const { fontScale } = useWindowDimensions();
+  const styles = getScaledStyles(fontScale);
   const dispatch = useDispatch();
-
+  const profileFormInitialValue = { fullName: user.displayName ?? '', email: user.email };
+  const passwordFormInitialValue = { existingPassword: '', password: '', confirmPassword: '' };
+  const profileValidator = ProfileValidator();
+  const passwordValidator = PasswordResetValidator();
+  const profileFields = [
+    {
+      name: "fullName",
+      type: "text",
+      placeholder: "Full Name"
+    },
+    {
+      name: "email",
+      type: "email",
+      placeholder: "Email"
+    }
+  ];
+  const passwordFields = [
+    {
+      name: "existingPassword",
+      type: "password",
+      placeholder: "Existing Password",
+      condition: user.providerData.map(provider => provider.providerId).includes("password")
+    },
+    {
+      name: "password",
+      type: "password",
+      placeholder: "New Password",
+    },
+    {
+      name: "confirmPassword",
+      type: "password",
+      placeholder: "Confirm New Password",
+    }
+  ]
+  const reAuthenticateToDelete = () =>{
+    if (user.providerData.map(provider => provider.providerId).includes("password")) {
+      NativeAlert.prompt("Confirm your identity",'Login Credentials', [{text:"Cancel",isPreferred: true, style:"cancel"},{text:"Confirm", style:"destructive", onPress: (value)=>{
+          if(value.login!=user.email){
+            NativeAlert.alert("Incorrect Email Address");
+          }else{
+            deleteAccount(value.password)
+          }
+        }}], "login-password","","secure-text")
+    }else{
+      if(Platform.OS=="ios"){
+        NativeAlert.prompt(
+          'Reset your password',
+          'Your account was created using a social login. Please enter your email address to reset the password.',
+          [
+            { text: 'Cancel', style: 'cancel' },
+            { text: 'Confirm', onPress: (value) => resetPassword(value) },
+          ],
+          'plain-text',
+          '',
+          'email-address'
+        );
+      }else{
+        NativeAlert.alert(
+          'Login',
+          '',
+          [
+            {
+              text: 'Cancel',
+              style: 'cancel'
+            },
+            {
+              text: 'OK',
+              onPress: () => console.log('OK Pressed')
+            },
+          ],
+          { 
+            content: (
+              <View>
+                <TextInput
+                  placeholder="Email"
+                  value={email}
+                  onChangeText={(text) => setEmail(text)}
+                />
+                <TextInput
+                  placeholder="Password"
+                  secureTextEntry={true}
+                  value={password}
+                  onChangeText={(text) => setPassword(text)}
+                />
+              </View>
+            )
+          }
+        );
+      }
+     
+    }
+  }
+  const confirmDeleteAccount = () =>{
+    NativeAlert.alert("Are you sure you want to delete your account?","This action cannot be undone.", [{text:"Cancel",isPreferred: true, style:"cancel"},{text:"Delete", style:"destructive", onPress: ()=> reAuthenticateToDelete()}])
+  }
   const uploadProfilePicture = async (uri) => {
-    dispatch(showLoader());
     try {
-      const currentUser = user;
-      const storageRef = storage().ref(`/users/${currentUser.uid}/profile_picture.jpg`);
-      await storageRef.putFile(uri);
-      const downloadURL = await storageRef.getDownloadURL();
-      // update user profile with new profile picture URL
-      await currentUser.updateProfile({
+      dispatch(showLoader());
+      var downloadURL = await ProfileService.uploadProfilePic(uri, user.uid);
+      await user.updateProfile({
         photoURL: downloadURL,
       });
-      await currentUser.reload();
-    } catch (e) {
-      Alert.alert("An error occured", e.message);
+      await user.reload();
+    } catch (error) {
+      console.log(error);
+    } finally {
+      dispatch(hideLoader());
     }
-    dispatch(hideLoader());
   };
-
   const handleUpdatePicture = () => {
     const options = {
       title: 'Select Profile Picture',
@@ -108,347 +169,142 @@ const Profile = () => {
       }
     });
   }
-  const deleteAccount = async (pass) =>{
-    dispatch(showLoader());
-
-    var existingCredential = getCredentialsForUser(user, pass);
-    try {
-      await user.reauthenticateWithCredential(existingCredential);
-    }
-    catch(e){
-      Alert.e("Incorrect password entered");
-      return;
-    }
-  
-    const quizAttemptRef = firestore().collection("quizAttempts").where("userId", "==", user.uid);
-    const progressRef = firestore().collection("progress").where("userId", "==", user.uid);
-    const coursesRef = firestore().collection('courses');
-    const courseQuery = coursesRef.where('enrollments', 'array-contains', user.uid);
-    
-    const batch = firestore().batch();
-  
-    const quizAttemptSnapshot = await quizAttemptRef.get();
-    const progressSnapshot = await progressRef.get();
-    const coursesSnapshot = await courseQuery.get();
-  
-    quizAttemptSnapshot.forEach(documentSnapshot => {
-      batch.delete(documentSnapshot.ref);
-    });
-  
-    progressSnapshot.forEach(documentSnapshot => {
-      batch.delete(documentSnapshot.ref);
-    });
-  
-    coursesSnapshot.forEach((courseDoc) => {
-      const courseRef = coursesRef.doc(courseDoc.id);
-      batch.update(courseRef, {
-        enrollments: firestore.FieldValue.arrayRemove(user.uid),
-      });
-    });
-  
-    try {
-      await batch.commit();
-      await user.delete();
-      console.log('Batch write operation completed successfully.');
-    } catch (error) {
-      console.log('Transaction failed: ', error);
-    }
-  
-    dispatch(hideLoader());
+  const getShortName = () => {
+    return user.displayName
+      ? user.displayName.substring(0, 2).toUpperCase()
+      : user.email
+        ? user.email.substring(0, 2).toUpperCase()
+        : 'A';
   }
-  
-  
-  const updatePassword = async (values, resetForm) => {
-    dispatch(showLoader());
-    try {
-      if (user.providerData.map(provider => provider.providerId).includes("password")) {
-        var existingCredential = getCredentialsForUser(user, values.existingPassword);
-        try {
-          await user.reauthenticateWithCredential(existingCredential);
-          await user.updatePassword(values.password);
-          await user.reload();
-        } catch (e) {
-          Alert.alert("Password not updated", "Incorrect existing password");
+  const _renderProfilePicture = () => {
+    return (
+      <TouchableOpacity onPress={handleUpdatePicture} style={styles.imagePicker}>
+        {
+          !user.photoURL && <View style={styles.textImage}>
+            <Text style={styles.textImagetext}>{getShortName()}</Text>
+          </View>
         }
-
-
-      } else {
-        var existingCredential = getCredentialsForUser(user);
-        await user.reauthenticateWithCredential(existingCredential);
-        // console.log("Umer", existingCredential);
-        const credential = auth.EmailAuthProvider.credential(user.email, values.password);
-        await user.linkWithCredential(credential);
-        await user.reload();
-      }
-    } catch (E) {
-      Alert.alert("An error occured", E.message);
-    }
-    resetForm(intialPassValue);
-    dispatch(hideLoader());
-  }
-  resetPassword = async (value)=>{
-    dispatch(showLoader());
-    try{
-      await auth().sendPasswordResetEmail(value);
-      Alert.alert("Check your email", "An email was sent to your email address to reset your password");
-      await auth().signOut();
-    }catch(e){
-      Alert.alert("An error occurred", "Invalid/Incorrect email address added.");
-    }
-    dispatch(hideLoader());
-  }
-  const handleCreate = async values => {
+        {user.photoURL && <ImageWrapper spinnerStyle={styles.activityLoader} imageStyle={styles.image} errorImageStyle={styles.image} src={user.photoURL} />
+        }
+      </TouchableOpacity>
+    )
+  };
+  const handleProfileUpdate = async values => {
     dispatch(showLoader());
     await user.updateEmail(values.email);
     await user.updateProfile({ displayName: values.fullName });
     await user.reload();
     dispatch(hideLoader());
   }
+  const updatePassword = async (values, resetForm) => {
+    try {
+      dispatch(showLoader());
+      if (user.providerData.map(provider => provider.providerId).includes("password")) {
+        var existingCredential = getCredentialsForUser(user, values.existingPassword);
+        try {
+          await user.reauthenticateWithCredential(existingCredential);
+          await user.updatePassword(values.password);
+          await user.reload();
+          resetForm(passwordFormInitialValue);
+        } catch (e) {
+          Alert.notify("Password not updated", "Incorrect existing password");
+        }
+      }
+      // else {
+      //   var existingCredential = getCredentialsForUser(user);
+      //   await user.reauthenticateWithCredential(existingCredential);
+      //   // console.log("Umer", existingCredential);
+      //   const credential = auth.EmailAuthProvider.credential(user.email, values.password);
+      //   await user.linkWithCredential(credential);
+      //   await user.reload();
+      // }
+    } catch (E) {
+      Alert.notify("An error occured", E.message);
+    } finally {
+      dispatch(hideLoader());
+    }
+  }
+
   return (
-    <>
-      <Container isScrollable={false}>
+    <Container>
+      <View style={{ flex: 1, gap: layout.gap.NEIGHBORS }}>
         <BackHeader type="text" text={"Profile"} />
-        <KeyboardAvoidingView
-          behavior={Platform.OS === 'ios' ? 'padding' : null}
-          style={{ flex: 1 }}
-        >
-          <ScrollView>
-            <View style={{ margin: 16 }}>
-              <View style={{ justifyContent: "center", flex: 1, alignItems: "center" }}>
-                <TouchableOpacity onPress={handleUpdatePicture} style={{ flex: 1 }}>
-                  {
-                    !user.photoURL && <View style={{ backgroundColor: colors.general.BRAND, justifyContent: "center", alignItems: "center", borderRadius: 50, width: 100, height: 100 }}>
-                      <Text style={{ color: "white", fontWeight: 600 }}>{user.displayName
-                        ? user.displayName.substring(0, 2).toUpperCase()
-                        : user.email
-                          ? user.email.substring(0, 2).toUpperCase()
-                          : 'A'}</Text>
-                    </View>
-                  }
-                  {
-                    user.photoURL && <View style={{ width: "100%", height: "100%", borderRadius: 50 }}>
-                      <ImageShower src={user.photoURL} />
-                    </View>
-                  }
-                </TouchableOpacity>
-                <View style={{ justifyContent: "center", flex: 1, alignItems: "center", marginVertical: 15 }}>
-                  <Text style={{ fontWeight: 600, fontSize: 24, fontFamily: typography.fontFamilies.PRIMARY, color: colors.font.PRIMARY }}>{user.displayName}</Text>
-                </View>
-                <View
-                  style={{
-                    borderBottomColor: '#D3D3D3',
-                    borderBottomWidth: 1,
+        <View style={{ flexDirection: "row", justifyContent: "center" }}>
+          {_renderProfilePicture()}
+        </View>
+        <View style={{ paddingHorizontal: layout.padding.HORIZONTAL, gap: layout.gap.NEIGHBORS }}>
+          <Text style={styles.fullName}>{user.displayName}</Text>
+          <LineBreak />
+          <ContentHeader title={'Basic Info'}>
+            <Form handleSubmit={handleProfileUpdate} buttonTitle={"Update Profile"} fields={profileFields} initalValues={profileFormInitialValue} validationSchema={profileValidator} />
+          </ContentHeader>
 
-                    width: '100%',
-                    // marginVertical:,
-                  }}
-                />
-                <View style={{ justifyContent: "flex-start", width: "100%", marginVertical: 10 }}>
-                  <Text style={{ fontWeight: 400, fontSize: 16, fontFamily: typography.fontFamilies.PRIMARY, color: colors.font.PRIMARY }}>Basic Info</Text>
-                  <Formik
-                    validationSchema={signupValidationSchema}
-                    initialValues={{ fullName: user.displayName ?? '', email: user.email }}
-                    onSubmit={handleCreate}>
-                    {({
-                      handleChange,
-                      handleBlur,
-                      handleSubmit,
-                      values,
-                      errors,
-                      isValid,
-                    }) => (
-                      <>
-                        <Field
-                          name="fullName"
-                          placeholder="Full Name"
-                          style={styles.textInput}
-                          error={errors.fullName}
-                          onChangeText={handleChange('fullName')}
-                          onBlur={handleBlur('fullName')}
-                          value={values.fullName}
-                        />
-                        <Field
-                          type="email"
-                          name="email"
-                          error={errors.email}
-                          placeholder="Email"
-                          style={styles.textInput}
-                          onChangeText={handleChange('email')}
-                          onBlur={handleBlur('email')}
-                          value={values.email}
-                        />
-                        {/* <View>
-                  <Field
-                    name="password"
-                    error={errors.password}
-                    placeholder="Password"
-                    style={styles.textInput}
-                    onChangeText={handleChange('password')}
-                    onBlur={handleBlur('password')}
-                    value={values.password}
-                    secureTextEntry
-                  />
-                </View> */}
-                        <Button onPress={handleSubmit} title="Save" />
-                      </>
-                    )}
-                  </Formik>
-                </View>
-                <View
-                  style={{
-                    borderBottomColor: '#D3D3D3',
-                    borderBottomWidth: 1,
+          {user.providerData.map(provider => provider.providerId).includes("password") && <>
+            <LineBreak />
+            <ContentHeader title={'Password'}>
+              <Form handleSubmit={updatePassword} buttonTitle={"Update Password"} fields={passwordFields} initalValues={passwordFormInitialValue} validationSchema={passwordValidator} />
+            </ContentHeader>
+          </>}
+          <LineBreak />
+          <ContentHeader title={'Social Logins'}>
+            <SocialLogin />
+          </ContentHeader>
+          <LineBreak />
+          <Button onPress={confirmDeleteAccount}>Delete Account</Button>
+          <Button type="outline" onPress={() => auth()
+            .signOut()
+            .then(() => console.log('User signed out!'))}>
+            Log out
+          </Button>
+        </View>
+      </View>
+    </Container>
+  );
+};
 
-                    width: '100%',
-                    // marginVertical:,
-                  }}
-                />
-               {user.providerData.map(provider => provider.providerId).includes("password")
-                &&  <View style={{ justifyContent: "flex-start", width: "100%", marginVertical: 10 }}>
-                <Text style={{ fontWeight: 400, fontSize: 16, fontFamily: typography.fontFamilies.PRIMARY, color: colors.font.PRIMARY }}>Update Password</Text>
-                <Formik
-                  initialValues={intialPassValue}
-                  onSubmit={(values, { resetForm }) => {
-                    updatePassword(values, resetForm)
-                  }}
-                  validationSchema={passwordValidationSchema}>
-                  {({
-                    handleChange,
-                    handleBlur,
-                    handleSubmit,
-                    values,
-                    errors,
-                    isValid,
-                  }) => (
-                    <>
-                      {user.providerData.map(provider => provider.providerId).includes("password") && <Field
-                        name="existingPassword"
-                        error={errors.existingPassword}
-                        placeholder="Existing Password"
-                        style={styles.textInput}
-                        onChangeText={handleChange('existingPassword')}
-                        onBlur={handleBlur('existingPassword')}
-                        value={values.existingPassword}
-                        secureTextEntry
-                      />}
-                      <Field
-                        secureTextEntry
-                        name="password"
-                        placeholder="New Password"
-                        style={styles.textInput}
-                        error={errors.password}
-                        onChangeText={handleChange('password')}
-                        onBlur={handleBlur('password')}
-                        value={values.password}
-                      />
-                      <Field
-                        secureTextEntry
-                        name="confirmPassword"
-                        placeholder="Confirm New Password"
-                        style={styles.textInput}
-                        error={errors.confirmPassword}
-                        onChangeText={handleChange('confirmPassword')}
-                        onBlur={handleBlur('confirmPassword')}
-                        value={values.confirmPassword}
-                      />
-                      {/* <View>
-               
-              </View> */}
-                      <Button onPress={handleSubmit} title="Update Password" />
-                    </>
-                  )}
-                </Formik>
-              </View>
-               }
-              </View>
-              <View
-                  style={{
-                    borderBottomColor: '#D3D3D3',
-                    borderBottomWidth: 1,
-
-                    width: '100%',
-                    // marginVertical:,
-                  }}
-                />
-                 <View style={{ justifyContent: "flex-start", width: "100%", marginVertical: 10, gap:10 }}>
-                  <Text style={{ fontWeight: 400, fontSize: 16, fontFamily: typography.fontFamilies.PRIMARY, color: colors.font.PRIMARY }}>Social Login</Text>
-                  <Apple />
-                  <Google />
-                  <Facebook />
-                </View>
-                <Button onPress={()=>{
-                  Alert.alert("Are you sure you want to delete your account?","This action cannot be undone.", [{text:"Cancel",isPreferred: true, style:"cancel"},{text:"Delete", style:"destructive", onPress: ()=>{
-                    if (user.providerData.map(provider => provider.providerId).includes("password")) {
-                        Alert.prompt("Confirm your identity",'Login Credentials', [{text:"Cancel",isPreferred: true, style:"cancel"},{text:"Confirm", style:"destructive", onPress: (value)=>{
-                          if(value.login!=user.email){
-                            Alert.alert("Incorrect Email Address");
-                          }else{
-                            deleteAccount(value.password)
-                          }
-                        }}], "login-password","","secure-text")
-                    }else{
-                      Alert.prompt("Reset your passowrd", "Your account was created using a social login. Please enter your email addresss to reset the password.", [{text:"Cancel",isPreferred: true, style:"cancel"},{text:"Confirm", style:"destructive", onPress: (value)=>{
-                        resetPassword(value)
-                      }}],"plain-text", "", "email-address")
-                    }
-                  }}])
-                }} title="Delete Account"></Button>
-              <Button type="outline" title={"Log out"} onPress={() => auth()
-                .signOut()
-                .then(() => console.log('User signed out!'))}></Button>
-            </View>
-          </ScrollView>
-        </KeyboardAvoidingView>
-        {/* <Button title="Logout" ></Button> */}
-      </Container>
-    </>
-  )
+const getScaledStyles = fontScale => {
+  return StyleSheet.create({
+    fullName: {
+      fontWeight: typography.fontWights.SEMI_BOLD,
+      fontSize: typography.fontSizes.FONT_SIZE_MEDIUM / fontScale,
+      fontFamily: typography.fontFamilies.PRIMARY,
+      color: colors.font.PRIMARY,
+      textAlign: "center"
+    },
+    imagePicker: {
+      borderRadius: 50,
+      width: 100,
+      height: 100
+    },
+    textImagetext: {
+      fontFamily: typography.fontFamilies.PRIMARY,
+      color: colors.font.SECONDARY,
+      fontWeight: typography.fontWights.SEMI_BOLD,
+      fontSize: typography.fontSizes.FONT_SIZE_CAPTION / fontScale
+    },
+    textImage: {
+      backgroundColor: colors.general.BRAND,
+      justifyContent: "center",
+      alignItems: "center",
+      height: "100%",
+      width: "100%",
+      borderRadius: 50,
+    },
+    image: {
+      height: "100%",
+      width: "100%",
+      borderRadius: 50,
+    },
+    activityLoader: {
+      position: 'absolute',
+      top: 0,
+      bottom: 0,
+      left: 0,
+      right: 0,
+      alignItems: 'center',
+      justifyContent: 'center',
+    }
+  });
 }
 
-const styles = StyleSheet.create({
-  //Header
-  imageContainer: {
-    alignItems: 'center',
-    marginTop: 45,
-    maxHeight: 45,
-  },
-  logo: {
-    maxWidth: 218,
-    maxHeight: 45,
-  },
-  textContainer: {
-    alignItems: 'center',
-    marginTop: 45,
-  },
-  textContent: {
-    textAlign: 'center',
-  },
-
-  //Social Login
-  provider: {
-    justifyContent: 'center',
-    alignItems: 'center',
-    borderRadius: 4,
-    borderWidth: 1,
-    borderStyle: 'solid',
-    padding: 10,
-    height: 50,
-  },
-  textInput: {
-    marginVertical: 5
-  },
-  providerContainer: {
-    flexDirection: 'row',
-    gap: 15,
-  },
-  providerText: {
-    fontFamily: typography.fontFamilies.PRIMARY,
-    fontWeight: '600',
-    fontSize: 20,
-  },
-  forgot: {
-    alignItems: 'flex-end',
-  },
-});
-
-export default Profile
+export default Profile;

@@ -1,8 +1,8 @@
 import React, { useContext, useEffect, useState } from "react";
 import { ScrollView, Text, View, Image } from "react-native";
-import CourseTab from "../../components/courseTab/CourseTab.component";
+import CourseTab from "../../components/tabs/TabBar";
 import Container from "../../components/layout/container/Container.component";
-import BackHeader from "../../components/navigation/organisms/BackHeader";
+import BackHeader from "../../components/headers/BackHeader.component";
 import firestore from '@react-native-firebase/firestore';
 import { UserContext } from "../../navigators/Application";
 import { useDispatch } from "react-redux";

@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { Image, View, Text } from "react-native";
 import Container from "../../components/layout/container/Container.component";
-import BackHeader from "../../components/navigation/organisms/BackHeader";
+import BackHeader from "../../components/headers/BackHeader.component";
 import { colors, typography } from "../../styles/theme.style";
 import emptyCart from '../../assets/images/emptyCart.png';
 import { useDispatch } from "react-redux";

@@ -17,6 +17,9 @@ export const typography = {
         SEMI_BOLD:"600",
         BOLD:"700",
         HEAVY_BOLD: "900"
+    },
+    lineHeight:{
+        DEFAULT: 22,
     }
 }
 
@@ -37,6 +40,9 @@ export const layout = {
     },
     borderRadius: {
         INPUT_FIELD: 10
+    },
+    size:{
+        BUTTON:44
     }
     
 }
@@ -56,7 +62,8 @@ export const colors = {
         BACKGROUND: "#EEEEEE",
         BRAND: "#128AAE",
         WHITE: "#fff",
-        BLACK: "#000"
+        BLACK: "#000",
+        GREEN: "#248A3D",
 
     },
     rating: {

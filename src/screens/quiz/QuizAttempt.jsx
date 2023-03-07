@@ -1,9 +1,9 @@
 import React, { useEffect, useState } from "react";
 import { Text, View ,TouchableOpacity,TextInput,StyleSheet} from 'react-native';
 import { useDispatch } from "react-redux";
-import Button from "../../components/button/Button.component";
+import Button from "../../components/buttons/Button.component";
 import Container from "../../components/layout/container/Container.component";
-import BackHeader from "../../components/navigation/organisms/BackHeader";
+import BackHeader from "../../components/headers/BackHeader.component";
 import { hideLoader, showLoader } from "../../features/loader/loaderSlice";
 import { colors, typography } from "../../styles/theme.style";
 import firestore from '@react-native-firebase/firestore';

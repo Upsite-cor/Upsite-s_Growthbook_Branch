@@ -1,50 +1,56 @@
-import React, { useContext, useEffect, useState } from 'react';
-import Icon from 'react-native-vector-icons/Ionicons';
-import Container from '../../components/layout/container/Container.component';
-import {TouchableOpacity, Text, View} from 'react-native';
-import {useDispatch} from 'react-redux';
-import {colors, typography} from '../../styles/theme.style';
-import { hideLoader, showLoader } from '../../features/loader/loaderSlice';
-import firestore from '@react-native-firebase/firestore';
+import React, { useContext, useEffect, useReducer } from 'react';
+import {View} from 'react-native';
 import { UserContext } from '../../navigators/Application';
-import TableOfContent from '../../components/tableOfContent/TableOfContent.component';
-import BackHeader from '../../components/navigation/organisms/BackHeader';
+import TableOfContent from '../../components/tables/molecules/TableOfContent.component';
+import BackHeader from '../../components/headers/BackHeader.component';
+import Container from '../../components/layout/Container2.component';
+import { layout } from '../../styles/theme.style';
+import LazyLoader from '../../components/layout/LazyLoader.component';
+import CourseService from '../../services/courses/Course.service';
+import Refresh from '../../components/layout/Refresh.component';
 
-
+const initialState = {refreshing:false, loaded: false, loading:true, progress : null};
+const reducer = (state, action) =>{
+    switch(action.type){
+      case 'SHOW_REFRESHER':
+        return {...state, refreshing:true};
+      case 'HIDE_REFRESHER':
+        return {...state, refreshing: false};
+      case "SET_PROGRESS":
+        return {...state, loaded: true, loading: false, progress: action.payload};
+      case 'SET_LOADER':
+        return {...state, loaded: false, loading: true};
+      default:
+        return state;
+    }
+}
 const CourseNavigation = ({route, navigation}) => {
   const {payload} = route.params;
-  const dispatch = useDispatch();
-  const [progress, setProgress] = useState([]);
+  const [state, dispatch] = useReducer(reducer, initialState);
   const User = useContext(UserContext);
 
-  const fetchProgress = async () => {
-    return await firestore().collection('progress').where('courseId','==', payload.courseId)
-    .where('userId','==', User.uid)
-    .limit(1)
-    .get();
-  };
-  const fetchData = async () =>{
-    dispatch(showLoader())
-    try{
-      let response = await fetchProgress();
-    if(response.size>0){
-      setProgress(response.docs[0].data());
-    }
-    dispatch(hideLoader());
-    }catch(e){
-      console.log(e);
-      
-    }
-    dispatch(hideLoader());
+  const refreshContent = async () =>{
+    dispatch({type: "SHOW_REFRESHER"});
+    dispatch({type:"SET_LOADER"});
+    await fetchData();
+    dispatch({type: "HIDE_REFRESHER"});
+  }
 
+  const _getRefreshControl =()=>{
+    return(
+      <Refresh refreshing={state.refreshing} onRefresh={refreshContent}/>
+    )
+  }
+
+  const fetchData = async () =>{
+    const progress = await CourseService.getProgress(payload.courseId,User.uid);
+    dispatch({type:"SET_PROGRESS", payload:progress})
   };
 
   useEffect(() => {
     const unsubscribe = navigation.addListener('focus', async () => {
       fetchData();
     });
-
-    // Return the function to unsubscribe from the event so it gets removed on unmount
     return unsubscribe;
   }, [navigation]);
 
@@ -55,17 +61,17 @@ const CourseNavigation = ({route, navigation}) => {
       "quiz": "quizPlayer",
       "material": "lectureViewer"
     }
-    navigation.navigate(routes[event?.type], {payload: {item: event, courseId: payload.courseId, progress:progress}});
+    navigation.navigate(routes[event?.type], {payload: {item: event, courseId: payload.courseId, progress:state.progress}});
   }
   return (
-    <>
-      <Container>
-      <BackHeader onPress={() => navigation.goBack()} text={"Table Of Content"} />
-       <View style={{marginTop: 15}}>
-       <TableOfContent  content={progress?.syllabus} onPress={handleNavigation}></TableOfContent>
-       </View>
-      </Container>
-    </>
+    <Container  scrollViewBounce={true} refreshControl={_getRefreshControl()}>
+        <View style={{flex:1,gap: layout.gap.NEIGHBORS}}>
+        <BackHeader onPress={() => navigation.goBack()} text={"Table Of Content"} />
+        <LazyLoader loaded={state.loaded} loading={state.loading} condition={state.progress}>
+          <TableOfContent  content={state.progress?.syllabus} onPress={handleNavigation}></TableOfContent>
+        </LazyLoader>
+        </View>
+    </Container>
   );
 };
 

@@ -2,15 +2,17 @@ import { Formik } from "formik";
 import React from "react";
 import { StyleSheet, View } from "react-native";
 import { layout } from "../../styles/theme.style";
-import Button from "../button/Button2.component";
+import Button from "../buttons/Button2.component";
 import Field from "./Field.component";
-const Form = ({ fields = [], buttonTitle="", initalValues, validationSchema, handleSubmit, style = null }) => {
+const Form = ({ fields = [], buttonTitle = "", initalValues, validationSchema, handleSubmit, style = null }) => {
     return (
         <View style={style}>
             <Formik
                 validationSchema={validationSchema}
                 initialValues={initalValues}
-                onSubmit={handleSubmit}>
+                onSubmit={(values, { resetForm }) => {
+                    handleSubmit ? handleSubmit(values, resetForm) : {}
+                }}>
                 {({
                     handleChange,
                     handleBlur,
@@ -21,23 +23,24 @@ const Form = ({ fields = [], buttonTitle="", initalValues, validationSchema, han
                 }) => (
                     <View style={styles.fieldContainer}>
                         {fields.map((field, index) => (
-                            <View key={field?.name}>
-                            <Field
-                                name={field.name}
-                                type={field.type}
-                                placeholder={field.placeholder}
-                                error={errors[field.name]}
-                                onChangeText={handleChange(field.name)}
-                                onBlur={handleBlur(field.name)}
-                                value={values[field.name]}
-                            />
-                            {
-                                field.component && 
-                                field.component()
-                            }       
-                            </View>
+                            // Check if the condition is defined and true
+                            field.condition==undefined || field.condition  ? (
+                                <View key={field?.name}>
+                                    <Field
+                                        name={field.name}
+                                        type={field.type}
+                                        placeholder={field.placeholder}
+                                        error={errors[field.name]}
+                                        onChangeText={handleChange(field.name)}
+                                        onBlur={handleBlur(field.name)}
+                                        value={values[field.name]}
+                                    />
+                                    {field.component && field.component()}
+                                </View>
+                            ) : null
                         ))}
-                        <Button style={{marginTop: layout.margin.NEIGHBORS}} onPress={handleSubmit}>
+
+                        <Button style={{ marginTop: layout.margin.NEIGHBORS }} onPress={handleSubmit}>
                             {buttonTitle}
                         </Button>
                     </View>

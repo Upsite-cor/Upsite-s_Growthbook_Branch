@@ -1,17 +1,10 @@
 import React from 'react';
-import { View, Text, StyleSheet, Dimensions, Animated } from 'react-native';
+import { View, Text, StyleSheet, Dimensions, Animated, Platform } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { colors, typography } from '../../styles/theme.style';
 
-const { height: SCREEN_HEIGHT } = Dimensions.get('window');
-
-const IS_IPHONE_X = SCREEN_HEIGHT === 812 || SCREEN_HEIGHT === 896;
-const STATUS_BAR_HEIGHT = Platform.OS === 'ios' ? (IS_IPHONE_X ? 44 : 20) : 0;
-const NAV_BAR_HEIGHT = Platform.OS === 'ios' ? (IS_IPHONE_X ? 88 : 64) : 64;
-
 const SCROLL_EVENT_THROTTLE = 16;
 const DEFAULT_HEADER_MAX_HEIGHT = 250;
-const DEFAULT_HEADER_MIN_HEIGHT = NAV_BAR_HEIGHT;
 const DEFAULT_EXTRA_SCROLL_HEIGHT = 30;
 const DEFAULT_BACKGROUND_IMAGE_SCALE = 1.5;
 
@@ -23,9 +16,10 @@ const Course = ({ children, backgroundImage, navbarAction }) => {
     const scrollY = new Animated.Value(0);
     const insets = useSafeAreaInsets();
     const alwaysShowNavBar = true;
-    const headerMinHeight = insets.top + 50;
-    const title = null;
-    const alwaysShowTitle = false;
+    const headerMinHeight = insets.top + 55;
+    const paddingTop= insets.top;
+    const title = "";
+    const alwaysShowTitle = true;
     const inputRange = [-DEFAULT_EXTRA_SCROLL_HEIGHT, 0, DEFAULT_HEADER_MAX_HEIGHT - headerMinHeight];
     const headerHeight = scrollY.interpolate({
         inputRange: inputRange,
@@ -135,6 +129,7 @@ const Course = ({ children, backgroundImage, navbarAction }) => {
                         transform: [{ translateY: titleTranslateY }],
                         height: headerHeight,
                         opacity: titleOpacity,
+                        paddingTop: paddingTop
                     },
                 ]}>
                 {typeof title === 'string' && (
@@ -150,7 +145,7 @@ const Course = ({ children, backgroundImage, navbarAction }) => {
                         opacity: navBarForegroundOpacity,
                     },
                 ]}>
-                {navbarAction}
+                {navbarAction()}
             </Animated.View>
         </View>
     );
@@ -183,7 +178,6 @@ const styles = StyleSheet.create({
     },
     bar: {
         backgroundColor: 'transparent',
-        height: DEFAULT_HEADER_MIN_HEIGHT,
         position: 'absolute',
         top: 0,
         left: 0,
@@ -195,7 +189,6 @@ const styles = StyleSheet.create({
         top: 0,
         left: 0,
         right: 0,
-        paddingTop: STATUS_BAR_HEIGHT,
         alignItems: 'center',
         justifyContent: 'center',
     },

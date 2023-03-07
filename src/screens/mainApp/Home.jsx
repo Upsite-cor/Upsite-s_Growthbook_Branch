@@ -1,11 +1,11 @@
 import React, {useEffect, useReducer} from 'react';
 import {Text, View, StyleSheet, useWindowDimensions, ActivityIndicator} from 'react-native';
-import Categories from '../../components/pills/molecules/Categories';
+import Categories from '../../components/pills/molecules/Categories.component';
 import ActionHeader from '../../components/headers/ActionHeader.component';
-import SearchButton from '../../components/button/SearchButton.component';
+import SearchButton from '../../components/buttons/SearchButton.component';
 import CourseList from '../../components/cards/molecules/CourseList.component';
 import MarketingSlideContainer from '../../components/cards/organisms/MarketingSlides';
-import Container from '../../components/layout/container/Container2.component';
+import Container from '../../components/layout/Container2.component';
 import AuthHeader from '../../components/headers/AuthHeader.component';
 import { colors, layout, typography } from '../../styles/theme.style';
 import Refresh from '../../components/layout/Refresh.component';

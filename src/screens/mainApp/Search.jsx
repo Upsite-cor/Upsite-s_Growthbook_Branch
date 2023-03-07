@@ -3,7 +3,7 @@ import { View, TextInput, StyleSheet, ScrollView, Text, ActivityIndicator } from
 import Icon from 'react-native-vector-icons/FontAwesome';
 import globalStylesheet from '../../styles/global.style';
 import Container from '../../components/layout/container/Container.component'
-import { SkillPillHolder } from '../../components/skillPill/SkillPill.component';
+import { SkillPillHolder } from '../../components/pills/molecules/CoursePillHolder.component';
 import { colors, typography } from '../../styles/theme.style';
 import firestore from '@react-native-firebase/firestore';
 import CourseCard from '../../components/home/courseCardv2/CourseCardv2.component';

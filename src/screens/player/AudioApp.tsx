@@ -1,7 +1,7 @@
 import React, {useEffect} from 'react';
 import {View} from 'react-native';
 import Container from '../../components/layout/container/Container.component';
-import BackHeader from '../../components/navigation/organisms/BackHeader';
+import BackHeader from '../../components/headers/BackHeader.component';
 import AudioPlayer from '../../components/audioPlayer/organisms/AudioPlayer';
 import {useDispatch, useSelector} from 'react-redux';
 import { hideLoader, showLoader } from '../../features/loader/loaderSlice';
