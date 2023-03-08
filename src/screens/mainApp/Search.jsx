@@ -2,12 +2,12 @@ import React, { useEffect, useReducer } from "react";
 import { ScrollView, Text, View, useWindowDimensions, StyleSheet } from "react-native";
 import Container from "../../components/layout/Container2.component";
 import SearchInput from "../../components/forms/SearchInput.component";
-import { layout } from "../../styles/theme.style";
+import { colors, layout, typography } from "../../styles/theme.style";
 import LineBreak from "../../components/layout/LineBreak.component";
 import LazyLoader from "../../components/layout/LazyLoader.component";
 import { Storage } from "../../utils";
 import CoursePillHolder from "../../components/pills/molecules/CoursePillHolder.component";
-import Button from "../../components/buttons/Button2.component";
+import Button from "../../components/buttons/Button.component";
 import waitingSearch from '../../assets/images/waitingSearch.png';
 import ErrorMessage from "../../components/exceptions/atoms/ErrorMessage.component";
 import CourseService from "../../services/courses/Course.service";
@@ -118,7 +118,7 @@ const Search = ({ navigation }) => {
         <ScrollView contentContainerStyle={{ flexGrow: 1 }}>
           <View style={styles.viewContainer}>
             {state.searchValue == "" && state.recentSearches?.length > 0 && <>
-              <Text>Top Searches</Text>
+              <Text style={styles.searchHeading}>Top Searches</Text>
               <CoursePillHolder clickHandler={(search) => {
                 dispatch({ type: "SET_SKILL_VAL", payload: search });
                 performSearch(search);
@@ -159,6 +159,12 @@ const getScaledStyles = fontScale => {
       paddingVertical: layout.padding.VERTICAL,
       gap: layout.gap.NEIGHBORS,
       flex: 1,
+    },
+    searchHeading:{
+      fontFamily: typography.fontFamilies.PRIMARY,
+      color: colors.font.PRIMARY,
+      fontSize: typography.fontSizes.FONT_SIZE_CAPTION/fontScale,
+      fontWeight: typography.fontWights.SEMI_BOLD
     }
   });
 }

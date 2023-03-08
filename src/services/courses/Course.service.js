@@ -11,6 +11,18 @@ export default class CourseService {
         });
         return courses;
     }
+    static async getCoursesInCategory(categoryId) {
+        var courses = [];
+        const coursesSnapshot = await firestore()
+          .collection(Tables.COURSES).where("categories", "array-contains", categoryId).get();
+        coursesSnapshot.docs.map((item) => {
+            courses.push({
+            ...item.data(),
+            id: item.id
+          });
+        });
+        return courses;
+    }
     static async getAllCourses() {
         var courses = [];
         const collection = await firestore().collection(Tables.COURSES)

@@ -5,7 +5,7 @@ import { launchImageLibrary } from "react-native-image-picker";
 import prompt from 'react-native-prompt-android';
 import { useDispatch } from "react-redux";
 import SocialLogin from "../../components/authProviders/organisms/SocialLogin.component";
-import Button from "../../components/buttons/Button2.component";
+import Button from "../../components/buttons/Button.component";
 import Form from "../../components/forms/Form.component";
 import BackHeader from "../../components/headers/BackHeader.component";
 import ContentHeader from "../../components/headers/ContentHeader.component";

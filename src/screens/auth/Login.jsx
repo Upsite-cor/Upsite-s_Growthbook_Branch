@@ -4,7 +4,7 @@ import Container from '../../components/layout/Container2.component';
 import AuthHeader from '../../components/headers/AuthHeader.component';
 import SocialLogin from '../../components/authProviders/organisms/SocialLogin.component';
 import LineBreak from '../../components/layout/LineBreak.component';
-import Button from '../../components/buttons/Button2.component';
+import Button from '../../components/buttons/Button.component';
 import { layout } from '../../styles/theme.style';
 import TermOfService from '../../components/footers/TermsOfService.component';
 

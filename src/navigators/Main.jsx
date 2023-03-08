@@ -11,7 +11,7 @@ const Tab = createBottomTabNavigator();
 const MainNavigation = () => {
   return (
     <Tab.Navigator
-    initialRouteName='Search'
+    initialRouteName='Home'
     screenOptions={{headerShown: false, tabBarActiveTintColor: colors.general.BRAND, tabBarInactiveTintColor:"#ABABAB"}}>
       <Tab.Screen
         name="Home"

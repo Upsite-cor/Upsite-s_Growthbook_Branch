@@ -1,249 +1,262 @@
-import React, { useEffect, useState } from "react";
-import { Text, View ,TouchableOpacity,TextInput,StyleSheet} from 'react-native';
-import { useDispatch } from "react-redux";
-import Button from "../../components/buttons/Button.component";
-import Container from "../../components/layout/container/Container.component";
+import { AppState, Text, TextInput, TouchableOpacity, View } from 'react-native';
+import React, { useEffect, useReducer, useRef, useState } from "react";
+import { StyleSheet, useWindowDimensions } from "react-native";
 import BackHeader from "../../components/headers/BackHeader.component";
-import { hideLoader, showLoader } from "../../features/loader/loaderSlice";
-import { colors, typography } from "../../styles/theme.style";
-import firestore from '@react-native-firebase/firestore';
-import { compareArrays, compareValues, generateId, secondsToText } from "../../utils";
+import Container from "../../components/layout/Container2.component";
+import { secondsToText } from "../../utils";
+import LazyLoader from '../../components/layout/LazyLoader.component';
+import { useDispatch } from 'react-redux';
+import { hideLoader, showLoader } from '../../features/loader/loaderSlice';
+import { colors, layout, typography } from '../../styles/theme.style';
+import Button from '../../components/buttons/Button.component';
+import { QuizService } from '../../services/courses/Quiz.service';
+import Alert from '../../utils/alert';
+
+const initalState = { loading: true, loaded: false, currentQuestion: null, currentIndex: 0, attempt: null };
+const reducer = (state, action) => {
+  switch (action.type) {
+    case 'SET_INITAL_DATA':
+      return { ...state, loading: false, loaded: true, currentQuestion: action.payload?.currentQuestion, attempt: action.payload?.attempt };
+    case 'UPDATE_ATTEMPT':
+      return { ...state, attempt: action.payload };
+    case 'SHOW_LOADER':
+      return {...state, loading:true};
+    case 'HIDE_LOADER':
+      return {...state, loading:false};
+    case 'CHANGE_QUESTION':
+      return {...state, currentQuestion: action.payload?.currentQuestion, currentIndex:action.payload?.currentIndex};
+    default:
+      return state;
+  }
+}
 const QuizAttempt = ({ route, navigation }) => {
-    const { payload } = route.params;
-    const dispatch = useDispatch();
-    const [remainingTime, setRemainingTime] = useState(payload?.quiz?.time * 1000);
-    const [quiz, setQuiz] = useState(payload?.quiz);
-    if (payload?.quiz?.questions?.length == 0) {
-        navigation.goBack();
-        return;
-    }
+  const { payload } = route.params;
+  const [timeLeft, setTimeLeft] = useState(payload?.quiz?.time * 1000);
+  const [finished, setFinished] = useState(false);
+  const { fontScale } = useWindowDimensions();
+  const globalDispatch = useDispatch();
+  const styles = getScaledStyles(fontScale);
+  console.log(styles.optionText);
+  const [state, dispatch] = useReducer(reducer, initalState);
 
-    const [currentQuestion, setQuestion] = useState(payload?.quiz?.questions[0]);
-    const [currentIndex, setCurrentIndex] = useState(0);
-    const [attempt, setAttempt] =  useState(payload?.attempt);
+  if (payload?.quiz?.questions?.length == 0) {
+    navigation.goBack();
+    return;
+  }
 
-    const currentAnswer = attempt.answers.find(x=> x.questionId== currentQuestion?.id);
-    const onSubmit = async () => {
-        dispatch(showLoader());
-        await evaluateAttempt(attempt, quiz);
-        dispatch(hideLoader());
-        navigation.goBack();
-    }
-    const evaluateAttempt = async (attempt, quiz) => {
-        attempt.status = 'completed';
-        if (attempt && attempt.answers && attempt.answers.length !== 0) {
-          attempt.answers = quiz?.questions?.map(question => {
-            var answer = attempt?.answers?.find(x => x.questionId == question?.id);
-            if (!answer) {
-              return {
-                id: generateId(),
-                questionId: question.id,
-                obtainedMark: 0,
-                answer: {
-                  givenAnswer: '',
-                  givenAnswers: [],
-                },
-              };
-            }
-    
-            if (question?.type == 'single') {
-              return {
-                ...answer,
-                obtainedMark: compareValues(
-                  answer?.answer?.givenAnswer,
-                  question?.answer?.value,
-                  question?.answer?.operation,
-                )
-                  ? question?.marks
-                  : 0,
-              };
-            } else {
-              return {
-                ...answer,
-                obtainedMark: compareArrays(
-                  answer?.answer?.givenAnswers,
-                  question?.answer?.correctOptions,
-                )
-                  ? question?.marks
-                  : 0,
-              };
-            }
-          });
-          attempt.obtainedMarks = attempt?.answers?.reduce(
-            (acc, current) => acc + current?.obtainedMark,
-            0,
-          );
-        } else {
-          attempt.answers = quiz.questions.map(question => ({
-            id: generateId(),
-            questionId: question.id,
-            obtainedMark: 0,
-            answer: {
-              givenAnswer: '',
-              givenAnswers: [],
-            },
-          }));
-          attempt.obtainedMarks = 0;
+  if (!state.loaded) {
+    dispatch({ type: "SET_INITAL_DATA", payload: { currentQuestion: payload?.quiz?.questions[0], attempt: payload?.attempt } });
+  }
+  var currentAnswer = null;
+  if (state.loaded) {
+    currentAnswer = state.attempt?.answers?.find(x => x.questionId == state?.currentQuestion?.id);
+  }
+
+  const onTextInputChanged = (text)=>{
+    const updatedAttempt = {
+      ...state.attempt,
+      answers: state.attempt.answers.map(answer => {
+        if (answer.questionId === state.currentQuestion?.id) {
+          return { ...answer, answer: { ...answer.answer, givenAnswer: text } };
         }
-        await firestore()
-          .collection('quizAttempts')
-          .doc(attempt?.id)
-          .update({
-            ...attempt,
-          });
-        return attempt;
-      };
-    const updateAttempt = async () =>{
-        await firestore()
-        .collection('quizAttempts')
-        .doc(attempt?.id)
-        .update(attempt);
-    }
-    const onNext = async () => {
-        dispatch(showLoader());
-        setCurrentIndex(curr=> curr+1);
-        setQuestion(quiz?.questions[currentIndex+1]);
-        await updateAttempt();
-      
-        dispatch(hideLoader());
-    }
-    const onPrevious = async ()=>{
-        dispatch(showLoader());
-        setCurrentIndex(curr=> curr-1);
-        setQuestion(quiz?.questions[currentIndex-1]);
-        await updateAttempt();
-        dispatch(hideLoader());
-    }
-    useEffect(() => {
-        let timerId = setTimeout(() => {
-            setRemainingTime(prev => prev - 1000);
-        }, 1000);
+        return answer;
+      })
+    };
+    dispatch({ type: "UPDATE_ATTEMPT", payload: updatedAttempt });
+  }
+  const optionsPressed = (option) => {
+    const updatedAttempt = {
+      ...state.attempt,
+      answers: state.attempt.answers.map(answer => {
+        if (answer.questionId === state.currentQuestion?.id) {
+          return { ...answer, answer: { ...answer.answer, givenAnswers: [option] } };
+        }
+        return answer;
+      })
+    };
+    dispatch({ type: "UPDATE_ATTEMPT", payload: updatedAttempt });
+  }
 
-        return () => {
-            clearTimeout(timerId);
-        };
-    }, [remainingTime]);
+  const onSubmit = async () => {
+    try {
+      globalDispatch(showLoader());
+      await QuizService.evaluateAttempt(state.attempt, payload?.quiz);
+    } catch (e) {
 
-    useEffect(() => {
+    } finally {
+      globalDispatch(hideLoader());
+      navigation.goBack();
+    }
+  };
+  const onNext = async () => {
+    try{
+      await QuizService.updateAttempt(state.attempt);
+      dispatch({type:"SHOW_LOADER"});
+      dispatch({type:"CHANGE_QUESTION", payload:{currentIndex:state.currentIndex + 1 ,currentQuestion:payload?.quiz?.questions[state.currentIndex + 1]}});
+    }catch(error){
+      Alert.notify("An error occured", error.message);
+    }finally{
+      dispatch({type:"HIDE_LOADER"});
+    }
+  }
+  const onPrevious = async () => {
+    try{
+      await QuizService.updateAttempt(state.attempt);
+      dispatch({type:"SHOW_LOADER"});
+      dispatch({type:"CHANGE_QUESTION", payload:{currentIndex:state.currentIndex - 1 ,currentQuestion:payload?.quiz?.questions[state.currentIndex - 1]}});
+    }catch(error){
+      Alert.notify("An error occured", error.message);
+    }finally{
+      dispatch({type:"HIDE_LOADER"});
+    }
+  }
+  useEffect(() => {
+    let intervalId;
+    const subscription = AppState.addEventListener("change", (app) => {
+      if (app == "active") {
+        const currentTime = new Date().getTime();
+        const elapsedTime = currentTime - payload?.attempt?.startTime;
+        const remainingTime = (payload?.quiz?.time * 1000) - elapsedTime;
         if (remainingTime <= 0) {
-            onSubmit();
+          intervalId ? clearInterval(intervalId) : {};
+          setTimeLeft(0);
+          // onSubmit();
+        } else {
+          setTimeLeft(remainingTime);
         }
-    }, [remainingTime]);
+      }
+    });
 
-    return (
-        <Container>
-            <BackHeader onPress={() => { navigation.goBack() }} text={secondsToText(remainingTime / 1000)} />
-            {currentQuestion && <View>
-                <View style={{
-                    marginVertical: 10
-                }}>
-                    <Text style={{
-                        fontFamily: typography.fontFamilies.PRIMARY,
-                        color: colors.font.PRIMARY,
-                        fontWeight: 700,
-                        fontSize: 24
-                    }}>{currentQuestion?.statement}</Text>
-                </View>
-                {
-                    currentQuestion?.type=="multiple" && (
-                        <View style={styles.container}>
-                        {currentQuestion?.answer?.options.map((option, index) => (
-                          <TouchableOpacity
-                            key={index}
-                            style={
-                                currentAnswer?.answer?.givenAnswers?.includes(option)
-                                ? [styles.option, styles.selectedOption]
-                                : styles.option
-                            }
-                            onPress={() => {
-                                const updatedAttempt = {
-                                    ...attempt,
-                                    answers: attempt.answers.map(answer => {
-                                      if (answer.questionId === currentQuestion?.id) {
-                                        return { ...answer, answer: { ...answer.answer, givenAnswers: [option] } };
-                                      }
-                                      return answer;
-                                    })
-                                  };
-                                  setAttempt(updatedAttempt);
-                            }}
-                          >
-                            <Text style={
-                               currentAnswer?.answer?.givenAnswers?.includes(option)
-                                ? [styles.optionText, styles.selectedOptionText]
-                                : styles.optionText
-                            }>{option}</Text>
-                          </TouchableOpacity>
-                        ))}
-                      </View>
-                    )
-                }
-                {
-                    currentQuestion?.type=="single" && (
-                        <View style={{marginVertical:10}}>
-                        <TextInput
-                          style={{ height: 250, borderColor: 'lightgrey',padding:5, borderWidth: 1 }}
-                          onChangeText={(text) => {
-                            const updatedAttempt = {
-                                ...attempt,
-                                answers: attempt.answers.map(answer => {
-                                  if (answer.questionId === currentQuestion?.id) {
-                                    return { ...answer, answer: { ...answer.answer, givenAnswer: text } };
-                                  }
-                                  return answer;
-                                })
-                              };
-                              setAttempt(updatedAttempt);
-                        }}
-                          value={currentAnswer?.answer?.givenAnswer}
-                          multiline={true}
-                        />
-                      </View>
-                    )
-                }
-            </View>
+    if (!intervalId) {
+      intervalId = setInterval(() => {
+        setTimeLeft(prev => prev - 1000);
+      }, 1000);
+    }
+    if (finished && intervalId) {
+      clearInterval(intervalId);
+    }
+
+    return () => {
+      intervalId ? clearInterval(intervalId) : {};
+      subscription.remove();
+    }
+  }, [finished])
+
+  useEffect(() => {
+    if (!finished) {
+      if (timeLeft <= 0) {
+        setFinished(true)
+        onSubmit();
+      }
+    }
+  }, [finished, timeLeft]);
+
+
+  return (
+    <Container>
+      <BackHeader onPress={() => { navigation.goBack() }} text={timeLeft <= 0 ? "Finished" : secondsToText(timeLeft / 1000)} />
+      <View style={{ flex: 1, paddingHorizontal: layout.padding.HORIZONTAL, gap: layout.gap.NEIGHBORS, paddingVertical: layout.padding.VERTICAL }}>
+        <View style={{ flex: 1,paddingVertical: layout.padding.VERTICAL  }}>
+          <LazyLoader condition={state.currentQuestion} loaded={state.loaded} loading={state.loading}>
+            <Text style={styles.questionStatement}>{state.currentQuestion?.statement}</Text>
+            {state.currentQuestion?.type == "multiple" && (
+              <View style={styles.multipleChoiceOptionsContainer}>
+                {state.currentQuestion?.answer?.options.map((option, index) => (
+                  <TouchableOpacity
+                    key={index}
+                    style={
+                      currentAnswer?.answer?.givenAnswers?.includes(option)
+                        ? [styles.option, styles.selectedOption]
+                        : styles.option
+                    }
+                    onPress={() => {
+                      optionsPressed(option);
+                    }}>
+                    <Text style={
+                      currentAnswer?.answer?.givenAnswers?.includes(option)
+                        ? [styles.optionText, styles.selectedOptionText]
+                        : styles.optionText
+                    }>{option}</Text>
+                  </TouchableOpacity>
+                ))}
+              </View>
+            )
             }
-            <View style={{flexDirection:"row",justifyContent:"space-between", alignItems:"flex-end"}}>
-                {currentIndex!=0 &&
-                <Button title={"Previous"} onPress={onPrevious}></Button>}
-                {currentIndex!=quiz?.questions?.length-1 &&
-                <Button title={"Next"} onPress={onNext}></Button>}
-                {currentIndex==quiz?.questions?.length-1 &&
-                 <Button title={"Submit"} onPress={()=>{
-                    onSubmit();
-                 }}></Button>}
+             {
+          state.currentQuestion?.type == "single" && (
+            <View style={{ paddingVertical: layout.padding.VERTICAL, gap:layout.gap.NEIGHBORS }}>
+              <TextInput
+                color={colors.font.PRIMARY} placeholderTextColor={colors.font.PLACEHOLDER}
+                style={styles.singleQuestionTextInput}
+                onChangeText={onTextInputChanged}
+                value={currentAnswer?.answer?.givenAnswer}
+                multiline={true}
+              />
             </View>
-        </Container>
-    )
+          )
+        }
+          </LazyLoader>
+        </View>
+        <View style={{flex:0, flexDirection: "row", justifyContent: "space-between", alignItems: "flex-end", gap: layout.gap.NEIGHBORS }}>
+            {state.currentIndex != 0 &&
+              <Button style={{ flex: 1 }} onPress={onPrevious}> Previous</Button>
+            }
+            {state.currentIndex != payload?.quiz?.questions?.length - 1 &&
+              <Button style={{ flex: 1 }} onPress={onNext}>Next</Button>}
+            {state.currentIndex == payload?.quiz?.questions?.length - 1 &&
+              <Button  style={{ flex: 1 }}  onPress={onSubmit}>Submit</Button>}
+          </View>
+      </View>
+    </Container>
+  );
 };
 
-
-const styles = StyleSheet.create({
-    container: {
+const getScaledStyles = fontScale => {
+  return StyleSheet.create({
+    questionStatement: {
+      fontFamily: typography.fontFamilies.PRIMARY,
+      color: colors.font.PRIMARY,
+      fontWeight: typography.fontWights.BOLD,
+      fontSize: typography.fontSizes.FONT_SIZE_MEDIUM / fontScale
+    },
+    singleQuestionTextInput:{ 
+      height: 250,
+      borderColor: 'lightgrey',
+      padding: 5,
+      borderWidth: 1,
+      borderRadius: layout.borderRadius.INPUT_FIELD
+    },
+    multipleChoiceOptionsContainer: {
       flexDirection: 'column',
       alignItems: 'center',
       justifyContent: 'space-between',
-      gap: 15,
-      marginVertical: 10,
+      gap: layout.gap.NEIGHBORS,
+      paddingVertical: layout.padding.VERTICAL
     },
     option: {
+      justifyContent: "center",
+      paddingHorizontal: layout.padding.INPUT_FIELDS,
       backgroundColor: 'white',
-      padding: 10,
-      borderRadius: 5,
-      width:"100%",
+      minHeight: 50 / fontScale,
+      borderRadius: layout.borderRadius.INPUT_FIELD,
+      width: "100%",
       borderWidth: 1,
-      borderColor: 'gray'
+      borderColor: colors.general.BACKGROUND,
     },
     selectedOption: {
       backgroundColor: colors.general.BRAND,
-
+      borderColor: colors.general.BRAND,
     },
-    selectedOptionText:{
-        color: colors.general.WHITE
+    selectedOptionText: {
+      color: colors.font.SECONDARY,
     },
     optionText: {
-      fontSize: 16
+      fontFamily: typography.fontFamilies.PRIMARY,
+      fontWeight: typography.fontWights.NORMAL,
+      fontSize: typography.fontSizes.FONT_SIZE_SMALL / fontScale,
+      color: colors.font.PRIMARY,
     }
-  });
+  })
+};
 
 export default QuizAttempt;

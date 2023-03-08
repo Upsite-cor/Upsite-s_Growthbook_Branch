@@ -2,7 +2,7 @@ import { Formik } from "formik";
 import React from "react";
 import { StyleSheet, View } from "react-native";
 import { layout } from "../../styles/theme.style";
-import Button from "../buttons/Button2.component";
+import Button from "../buttons/Button.component";
 import Field from "./Field.component";
 const Form = ({ fields = [], buttonTitle = "", initalValues, validationSchema, handleSubmit, style = null }) => {
     return (

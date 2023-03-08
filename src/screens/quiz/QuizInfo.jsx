@@ -1,190 +1,42 @@
-import {Text, View, Image, StyleSheet} from 'react-native';
-import Container from '../../components/layout/container/Container.component';
-import BackHeader from '../../components/headers/BackHeader.component';
+import React, { useContext, useEffect, useReducer } from "react";
+import { Image, View, Text, StyleSheet, useWindowDimensions } from "react-native";
+import BackHeader from "../../components/headers/BackHeader.component";
+import Container from "../../components/layout/Container2.component";
+import { colors, layout, typography } from "../../styles/theme.style";
 import quizImage from '../../assets/images/quizImage.png';
-import firestore from '@react-native-firebase/firestore';
-import {useContext, useEffect, useState} from 'react';
-import {useDispatch} from 'react-redux';
-import {hideLoader, showLoader} from '../../features/loader/loaderSlice';
-import {colors, typography} from '../../styles/theme.style';
-import Button from '../../components/buttons/Button.component';
-import {
-  secondsToText,
-  generateId,
-  compareValues,
-  compareArrays,
-} from '../../utils';
-import {UserContext} from '../../navigators/Application';
-import { isContentCompleted, markContentCompleted } from '../../services/courses/progressService';
+import LazyLoader from "../../components/layout/LazyLoader.component";
+import { QuizService } from "../../services/courses/Quiz.service";
+import { UserContext } from "../../navigators/Application";
+import { secondsToText, generateId, compareValues, compareArrays } from '../../utils';
+import { isContentCompleted, markContentCompleted } from "../../services/courses/progressService";
+import CourseService from "../../services/courses/Course.service";
+import LineBreak from "../../components/layout/LineBreak.component";
+import Button from "../../components/buttons/Button.component";
 
-const QuizInfo = ({route, navigation}) => {
-  const [quiz, setQuiz] = useState();
-  const [completedAttempts, setCompletedAttempts] = useState([]);
-  const [isPassed, setPassed] = useState(false);
-
+const initialState = { quiz: null, completedAttempts: [], isPassed: false, loading: true, loaded: false, error: false }
+const reducer = (state, action) => {
+  switch (action.type) {
+    case 'SET_ERROR':
+      return { ...state, error: true, loading: false, loaded: true };
+    case 'SET_PASSED':
+      return { ...state, isPassed: true };
+    case 'SET_DATA':
+      return { ...state, error: false, loading: false, loaded: true, quiz: action.payload?.quiz, completedAttempts: action.payload?.completedAttempts };
+    default:
+      return state;
+  }
+}
+const QuizInfo = ({ route, navigation }) => {
+  const [state, dispatch] = useReducer(reducer, initialState);
+  const { fontScale } = useWindowDimensions();
+  const styles = getScaledStyles(fontScale);
   const user = useContext(UserContext);
-
-  const dispatch = useDispatch();
-  const {payload} = route.params;
+  const { payload } = route.params;
 
   const fetchProgress = async () => {
-    const progress= await firestore().collection('progress').where('courseId','==', payload.courseId)
-    .where('userId','==', user.uid)
-    .limit(1)
-    .get();
-    const id = progress.docs[0].id;
-    return {...progress.docs[0].data(), id: id};
+    return await CourseService.getProgress(payload.courseId, user.uid);
   };
-
-  const updateProgress = async (progress) =>{
-    await firestore()
-  .collection('progress')
-  .doc(progress.id)
-  .update(progress);
-  }
-
-  const fetchQuiz = async () => {
-    const quiz = await firestore()
-      .collection('quizzes')
-      .doc(payload?.item?.contentId)
-      .get();
-    return {...quiz.data(), id: quiz.id};
-  };
-  const getBestResult = () => {
-    if (completedAttempts?.length == 0) {
-      return '-';
-    }
-    const totalMarks = quiz?.totalMarks;
-    return (
-      completedAttempts
-        .map(item => item?.obtainedMarks / totalMarks)
-        .sort((a, b) => b - a)[0] *
-        100 +
-      '%'
-    );
-  };
-  const getPassedDate = () => {
-    if (completedAttempts?.length == 0) {
-      return '-';
-    }
-    const totalMarks = quiz?.totalMarks;
-    passingScore = completedAttempts
-      .map(item => {
-        return {
-          date: item.startTime,
-          percentage: item?.obtainedMarks / totalMarks,
-        };
-      })
-      .sort((a, b) => b.percentage - a.percentage)[0];
-    if (
-      passingScore &&
-      passingScore?.percentage * 100 >= quiz?.passingPercentage
-    ) {
-      var date = new Date(0);
-      date.setUTCMilliseconds(passingScore?.date);
-      return date?.toDateString();
-    }
-    return '-';
-  };
-  const evaluateAttempt = async (attempt, quiz) => {
-    attempt.status = 'completed';
-    if (attempt && attempt.answers && attempt.answers.length !== 0) {
-      attempt.answers = quiz?.questions?.map(question => {
-        var answer = attempt?.answers?.find(x => x.questionId == question?.id);
-        if (!answer) {
-          return {
-            id: generateId(),
-            questionId: question.id,
-            obtainedMark: 0,
-            answer: {
-              givenAnswer: '',
-              givenAnswers: [],
-            },
-          };
-        }
-
-        if (question?.type == 'single') {
-          return {
-            ...answer,
-            obtainedMark: compareValues(
-              answer?.answer?.givenAnswer,
-              question?.answer?.value,
-              question?.answer?.operation,
-            )
-              ? question?.marks
-              : 0,
-          };
-        } else {
-          return {
-            ...answer,
-            obtainedMark: compareArrays(
-              answer?.answer?.givenAnswers,
-              question?.answer?.correctOptions,
-            )
-              ? question?.marks
-              : 0,
-          };
-        }
-      });
-      attempt.obtainedMarks = attempt?.answers?.reduce(
-        (acc, current) => acc + current?.obtainedMark,
-        0,
-      );
-    } else {
-      attempt.answers = quiz.questions.map(question => ({
-        id: generateId(),
-        questionId: question.id,
-        obtainedMark: 0,
-        answer: {
-          givenAnswer: '',
-          givenAnswers: [],
-        },
-      }));
-      attempt.obtainedMarks = 0;
-    }
-    await firestore()
-      .collection('quizAttempts')
-      .doc(attempt?.id)
-      .update({
-        ...attempt,
-      });
-    return attempt;
-  };
-  const fetchAttempts = async quiz => {
-    const completedAttempts = [];
-    const attemptsToRevoke = [];
-
-    const attemptsRaw = await firestore()
-      .collection('quizAttempts')
-      .where('courseId', '==', quiz?.courseId)
-      .where('userId', '==', user.uid)
-      .get();
-    attemptsRaw.docs.forEach(qualifyingAttempts => {
-      var attempt = {...qualifyingAttempts.data(), id: qualifyingAttempts.id};
-      if (attempt?.status && attempt?.status == 'completed') {
-        completedAttempts.push(attempt);
-      } else {
-        attemptsToRevoke.push(attempt);
-        // var elapsedTime = new Date().getTime() - attempt?.startTime;
-        // if (elapsedTime / 1000 < quiz?.time) {
-        //   if (!validAttempt) {
-        //     validAttempt = attempt;
-        //   } else {
-        //     attemptsToRevoke.push(attempt);
-        //   }
-        // } else {
-        //   attemptsToRevoke.push(attempt);
-        // }
-      }
-    });
-
-    for (var attempt of attemptsToRevoke) {
-      attempt = await evaluateAttempt(attempt, quiz);
-      completedAttempts.push(attempt);
-    }
-    return completedAttempts;
-  };
-  const checkIfPassed =async (completedAttempts, quiz) => {
+  const checkIfPassed = async (completedAttempts, quiz) => {
     if (completedAttempts?.length == 0) {
       return;
     }
@@ -202,44 +54,89 @@ const QuizInfo = ({route, navigation}) => {
       passingScore?.percentage * 100 >= quiz?.passingPercentage
     ) {
       const progress = await fetchProgress();
-      if(!isContentCompleted(payload?.item?.contentId, progress)){
-        const updatedProgress=  markContentCompleted(payload?.item?.contentId, progress);
-        await updateProgress(updatedProgress);
-      }   
+      if (!isContentCompleted(payload?.item?.contentId, progress)) {
+        const updatedProgress = markContentCompleted(payload?.item?.contentId, progress);
+        await CourseService.updateProgress(updatedProgress);
+      }
     }
-  }
+  };
   const fetchPayload = async () => {
-    dispatch(showLoader());
-    if(payload?.item?.isCompleted && !isPassed){
-      setPassed(true);
+    if (payload?.item?.isCompleted && !state.isPassed) {
+      dispatch({ type: "SET_PASSED" });
     }
     try {
-      const fetchedQuiz = await fetchQuiz();
-      const completedAttempts = await fetchAttempts(
-        fetchedQuiz,
-      );
-      if(!isPassed && !payload?.item?.isCompleted){
-        await checkIfPassed(completedAttempts, fetchedQuiz);
+      if (payload?.item?.contentId) {
+        const fetchedQuiz = await QuizService.getQuiz(payload?.item?.contentId);
+        if (fetchedQuiz != null) {
+          const completedAttempts = await fetchAttempts(fetchedQuiz);
+          if (!state.isPassed && !payload?.item?.isCompleted) {
+            await checkIfPassed(completedAttempts, fetchedQuiz);
+          }
+          dispatch({ type: "SET_DATA", payload: { quiz: fetchedQuiz, completedAttempts: completedAttempts } })
+        } else {
+          throw new Error("Error occured fecthing the quiz.");
+        }
+      } else {
+        throw new Error("No quiz id provided with the payload.");
       }
-      setQuiz(fetchedQuiz);
-      setCompletedAttempts(completedAttempts);
     } catch (e) {
       console.log(e);
-    } finally {
-      dispatch(hideLoader());
+      dispatch({ type: "SET_ERROR" });
     }
+  };
+  const fetchAttempts = async quiz => {
+    const completedAttempts = [];
+    const attemptsToRevoke = [];
+
+    const attempts = await QuizService.fetchAttempts(quiz?.courseId, user.uid);
+    attempts.forEach(attempt => {
+      if (attempt?.status && attempt?.status == 'completed') {
+        completedAttempts.push(attempt);
+      } else {
+        attemptsToRevoke.push(attempt);
+      }
+    });
+
+    for (var attempt of attemptsToRevoke) {
+      attempt = await QuizService.evaluateAttempt(attempt, quiz);
+      completedAttempts.push(attempt);
+    }
+    return completedAttempts;
+  };
+  const getPassedDate = () => {
+    if (state.completedAttempts?.length == 0) {
+      return '-';
+    }
+    const totalMarks = state.quiz?.totalMarks;
+    passingScore = state.completedAttempts
+      .map(item => {
+        return {
+          date: item.startTime,
+          percentage: item?.obtainedMarks / totalMarks,
+        };
+      })
+      .sort((a, b) => b.percentage - a.percentage)[0];
+    if (
+      passingScore &&
+      passingScore?.percentage * 100 >= state.quiz?.passingPercentage
+    ) {
+      var date = new Date(0);
+      date.setUTCMilliseconds(passingScore?.date);
+      return date?.toDateString();
+    }
+    return '-';
   };
   const startQuiz = async () => {
     var attempt = {
       courseId: payload?.courseId,
       obtainedMarks: 0,
-      quizId: quiz?.id,
+      quizId: state.quiz?.id,
       startTime: new Date().getTime(),
       status: "pending",
       userId: user.uid,
       answers: []
     };
-    attempt.answers = quiz?.questions?.map(question => {
+    attempt.answers = state.quiz?.questions?.map(question => {
       return {
         id: generateId(),
         questionId: question.id,
@@ -250,123 +147,115 @@ const QuizInfo = ({route, navigation}) => {
         },
       };
     });
-    const attemptRaw =await  firestore()
-    .collection('quizAttempts')
-    .add(attempt);
-    navigation.navigate('quizAttempt', { payload:{ attempt: {...attempt, id: attemptRaw.id}, quiz: quiz}});
+    const attemptRaw = await QuizService.addQuizAttempt(attempt);
+    navigation.navigate('quizAttempt', { payload: { attempt: { ...attempt, id: attemptRaw.id }, quiz: state.quiz } });
+  };
+  const getBestResult = () => {
+    if (state.completedAttempts?.length == 0) {
+      return '-';
+    }
+    const totalMarks = state.quiz?.totalMarks;
+    return (
+      state.completedAttempts
+        .map(item => item?.obtainedMarks / totalMarks)
+        .sort((a, b) => b - a)[0] *
+      100 +
+      '%'
+    );
   };
 
   useEffect(() => {
     const unsubscribe = navigation.addListener('focus', async () => {
       await fetchPayload();
     });
-
     return unsubscribe;
   }, [navigation]);
-
+  
   return (
-    <Container isScrollable={false}>
-      <View style={{flex: 1}}>
+    <Container>
+      <View style={{ flex: 1, gap: layout.gap.NEIGHBORS }}>
         <BackHeader onPress={() => navigation.goBack()} text={'Quiz'} />
-        <View style={{backgroundColor: '#71c1944d'}}>
-          <Image source={quizImage} />
-        </View>
-        {quiz && (
-          <>
-            <View style={{marginHorizontal: 16}}>
-              <Text
-                style={{
-                  fontFamily: typography.fontFamilies.PRIMARY,
-                  fontWeight: 700,
-                  fontSize: 24,
-                  marginVertical: 15,
-                  color: colors.font.PRIMARY,
-                }}>
-                {quiz?.title}
-              </Text>
+        <LazyLoader loading={state.loading} loaded={state.loaded} condition={!state.error}>
+          <View style={{ flex: 1, gap: layout.gap.NEIGHBORS, paddingHorizontal: layout.padding.HORIZONTAL }}>
+            <View style={styles.imagebackground}>
+              <Image source={quizImage} />
             </View>
-
-            <View
-              style={{
-                borderBottomColor: '#D3D3D3',
-                borderBottomWidth: 1,
-
-                width: '100%',
-                // marginVertical:,
-              }}
-            />
-            <View style={{paddingVertical: 5, marginHorizontal: 16}}>
+            <Text
+              style={styles.quizTitle}>
+              {state?.quiz?.title}
+            </Text>
+            <LineBreak type="continuous" />
+            <View>
               <Text style={styles.timeToCompleteLabel}>Time to Complete</Text>
               <Text style={styles.timeToComplete}>
-                {secondsToText(quiz?.time)}
+                {secondsToText(state.quiz?.time)}
               </Text>
             </View>
-            <View
-              style={{
-                borderBottomColor: '#D3D3D3',
-                borderBottomWidth: 1,
-                width: '100%',
-              }}
-            />
-            <View style={{paddingVertical: 5, marginHorizontal: 16}}>
-              <View style={styles.subInformationContainer}>
-                <Text>Number of Questions</Text>
-                <Text>{quiz?.questions?.length}</Text>
-              </View>
-              <View style={styles.subInformationContainer}>
-                <Text>Passing Percentage</Text>
-                <Text>{quiz?.passingPercentage}%</Text>
-              </View>
+            <LineBreak type="continuous" />
+            <View style={styles.subInformationContainer}>
+              <Text style={styles.text}>Number of Questions</Text>
+              <Text style={styles.text}>{state.quiz?.questions?.length}</Text>
             </View>
-            <View
-              style={{
-                borderBottomColor: '#D3D3D3',
-                borderBottomWidth: 1,
-                width: '100%',
-              }}
-            />
-            <View style={{paddingVertical: 5, marginHorizontal: 16}}>
-              <View style={styles.subInformationContainer}>
-                <Text>Best Result</Text>
-                <Text>{getBestResult()}</Text>
-              </View>
-              <View style={styles.subInformationContainer}>
-                <Text>Passing Date</Text>
-                <Text>{getPassedDate()}</Text>
-              </View>
+            <View style={styles.subInformationContainer}>
+              <Text style={styles.text}>Passing Percentage</Text>
+              <Text style={styles.text}>{state.quiz?.passingPercentage}%</Text>
             </View>
-            <View
-              style={{
-                paddingHorizontal: 16,
-                width: '100%',
-                bottom: 5,
-                position: 'absolute',
-              }}>
-              <Button title="Start" onPress={startQuiz}></Button>
+            <LineBreak type="continuous" />
+            <View style={styles.subInformationContainer}>
+              <Text style={styles.text}>Best Result</Text>
+              <Text style={styles.text}>{getBestResult()}</Text>
             </View>
-          </>
-        )}
+            <View style={styles.subInformationContainer}>
+              <Text style={styles.text}>Passing Date</Text>
+              <Text style={styles.text}>{getPassedDate()}</Text>
+            </View>
+          </View>
+          <View style={{ marginBottom: layout.padding.VERTICAL, paddingHorizontal: layout.padding.HORIZONTAL  }}>
+            <Button onPress={startQuiz}>Attempt</Button>
+          </View>
+        </LazyLoader>
       </View>
     </Container>
-  );
+  )
 };
 
-const styles = StyleSheet.create({
-  subInformationContainer: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    marginVertical: 5,
-  },
-  timeToCompleteLabel: {
-    fontFamily: typography.fontFamilies.PRIMARY,
-    fontSize: 20,
-    color: colors.font.BRAND,
-  },
-  timeToComplete: {
-    fontFamily: typography.fontFamilies.PRIMARY,
-    fontSize: 24,
-    color: colors.font.PRIMARY,
-  },
-});
+const getScaledStyles = fontScale => {
+  return StyleSheet.create({
+    quizTitle: {
+      fontFamily: typography.fontFamilies.PRIMARY,
+      fontWeight: typography.fontWights.BOLD,
+      fontSize: typography.fontSizes.FONT_SIZE_MEDIUM / fontScale,
+      color: colors.font.PRIMARY,
+    },
+    imagebackground: {
+      flexDirection: "row",
+      backgroundColor: colors.general.SECONDARY_BACKGROUND,
+      marginHorizontal: layout.padding.HORIZONTAL * -1,
+      justifyContent: "center"
+    },
+    subInformationContainer: {
+      flexDirection: 'row',
+      justifyContent: 'space-between',
+    },
+    timeToCompleteLabel: {
+      fontFamily: typography.fontFamilies.PRIMARY,
+      fontSize: typography.fontSizes.FONT_SIZE_MEDIUM / fontScale,
+      color: colors.font.BRAND,
+      fontWeight: typography.fontWights.NORMAL,
+    },
+    timeToComplete: {
+      fontFamily: typography.fontFamilies.PRIMARY,
+      fontSize: typography.fontSizes.FONT_SIZE_MEDIUM / fontScale,
+      color: colors.font.PRIMARY,
+      fontWeight: typography.fontWights.NORMAL,
+    },
+    text:{
+      fontFamily: typography.fontFamilies.PRIMARY,
+      fontSize: typography.fontSizes.FONT_SIZE_CAPTION / fontScale,
+      color: colors.font.PRIMARY,
+      fontWeight: typography.fontWights.NORMAL,
+    }
+  })
+}
 
 export default QuizInfo;

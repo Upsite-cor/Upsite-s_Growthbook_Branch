@@ -1,7 +1,7 @@
 import React from "react";
 import { View } from "react-native";
 import { useDispatch } from "react-redux";
-import Button from "../../components/buttons/Button2.component";
+import Button from "../../components/buttons/Button.component";
 import TermOfService from "../../components/footers/TermsOfService.component";
 import Form from "../../components/forms/Form.component";
 import AuthHeader from "../../components/headers/AuthHeader.component";

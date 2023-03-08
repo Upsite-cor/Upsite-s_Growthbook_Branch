@@ -61,7 +61,7 @@ const TableContentItem = ({item,onPress ,isChapter = true}) => {
                     backgroundColor: colors.general.WHITE,
                   },
                 ]}>
-                <Icon size={20} name={iconForItem[item.type]}></Icon>
+                <Icon size={typography.fontSizes.FONT_SIZE_BUTTON/fontScale} color={colors.font.PRIMARY} name={iconForItem[item.type]}></Icon>
                 <Text
                   style={[
                     styles.itemText,
@@ -74,7 +74,7 @@ const TableContentItem = ({item,onPress ,isChapter = true}) => {
               </View>
               <View>
                 {item.isCompleted && (
-                  <CheckIcon size={20} color={colors.general.GREEN} name="checkcircleo" />
+                  <CheckIcon size={typography.fontSizes.FONT_SIZE_BUTTON/fontScale} color={colors.general.GREEN} name="checkcircleo" />
                 )}
               </View>
             </View>

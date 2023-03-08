@@ -59,6 +59,7 @@ export const colors = {
         WHITE:"#FFF"
     },
     general:{
+        SECONDARY_BACKGROUND :"#71c1944d",
         BACKGROUND: "#EEEEEE",
         BRAND: "#128AAE",
         WHITE: "#fff",

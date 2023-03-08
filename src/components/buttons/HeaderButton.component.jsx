@@ -8,7 +8,7 @@ const HeaderButton = ({icon, onPress, type ="PRIMARY"}) =>{
   const styles = getScaledStyle(fontScale,type);
     return(
       <TouchableOpacity onPress={()=> onPress? onPress(): ()=>{}} style={styles.button}>
-        <Icon name={icon} size={typography.fontSizes.FONT_SIZE_LARGE/fontScale}/>
+        <Icon name={icon} color={colors.font.PRIMARY} size={typography.fontSizes.FONT_SIZE_LARGE/fontScale}/>
       </TouchableOpacity>
     );
   };

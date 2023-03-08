@@ -1,61 +1,47 @@
 import React from 'react';
-import {TouchableOpacity, Text, StyleSheet, View} from 'react-native';
-import {colors, typography} from '../../styles/theme.style';
+import { TouchableOpacity, Text, StyleSheet, View, useWindowDimensions } from 'react-native';
+import { colors, typography } from '../../styles/theme.style';
 
-const Button = ({title, onPress, type = 'default', style = null, innerStyle =null,textStyle = null}) => {
-
-  const getText = ()=>{
-    return (
-      <Text style={[type=="default"? styles.text: styles.textOutline, textStyle]}>{title}</Text>
-    )
-  }
-  const styleProps = type=="default"? {...styles.container, ...innerStyle}: {...styles.containerOutline, ...innerStyle}
+const Button = ({ children, onPress, type = 'default', style = null, containerStyle = null, textStyle = null }) => {
+  const { fontScale } = useWindowDimensions();
+  const styles = useScaledStyles(fontScale);
+  const [presetContainerStyle, presetTextStyle] = getpresetStyles(type, fontScale);
+  const mergedContainerStyle = StyleSheet.flatten([styles.container, presetContainerStyle, containerStyle]);
   return (
     <View style={style}>
-      {type == 'default' && (
-        <TouchableOpacity onPress={onPress} style={styleProps}>
-        {getText()}
-        </TouchableOpacity>
-      )}
-      {type == 'outline' && (
-        <TouchableOpacity onPress={onPress} style={styleProps}>
-        {getText()}
-        </TouchableOpacity>
-      )}
+      <TouchableOpacity onPress={onPress} style={mergedContainerStyle}>
+        <Text style={[styles.text, presetTextStyle, textStyle]}>{children}</Text>
+      </TouchableOpacity>
     </View>
   );
 };
 
-const styles = StyleSheet.create({
-  container: {
-    width: '100%',
+const getpresetStyles = (type, fontScale) => {
+  const presetContainerStyle = type == "default" ? {
     borderRadius: 4,
-    backgroundColor: colors.general.BRAND,
-    padding: 10,
-    height: 50,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  text: {
-    fontFamily: typography.fontFamilies.PRIMARY,
-    fontWeight: '600',
-    fontSize: 20,
-    color: colors.font.SECONDARY,
-  },
+    backgroundColor: colors.general.BRAND
+  } : {}
+  const presetTextStyle = type == "default" ? {
+    fontSize: typography.fontSizes.FONT_SIZE_BUTTON / fontScale,
+    color: colors.font.SECONDARY
+  } : {
+    fontSize: typography.fontSizes.FONT_SIZE_BUTTON_OUTLINE / fontScale,
+    color: colors.font.BRAND
+  }
+  return [presetContainerStyle, presetTextStyle]
+}
 
-  containerOutline: {
-    width: '100%',
-    borderRadius: 4,
-    padding: 10,
-    height: 50,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  textOutline: {
-    fontFamily: typography.fontFamilies.PRIMARY,
-    fontWeight: '600',
-    fontSize: 16,
-    color: colors.font.BRAND,
-  },
-});
+const useScaledStyles = (fontScale) => {
+  return StyleSheet.create({
+    container: {
+      justifyContent: 'center',
+      alignItems: 'center',
+      height: 50 / fontScale,
+    },
+    text: {
+      fontFamily: typography.fontFamilies.PRIMARY,
+      fontWeight: typography.fontWights.SEMI_BOLD
+    },
+  });
+}
 export default Button;

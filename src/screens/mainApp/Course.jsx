@@ -2,7 +2,7 @@ import React, { useContext, useEffect, useReducer } from "react";
 import { StyleSheet, Text, useWindowDimensions, View } from "react-native";
 import { useDispatch } from "react-redux";
 import AnimatedHeader from "../../components/animations/AnimatedHeader.component";
-import Button from "../../components/buttons/Button2.component";
+import Button from "../../components/buttons/Button.component";
 import AnimatedNavHeader from "../../components/headers/AnimatedNavHeader.component";
 import AuthorHeader from "../../components/headers/AuthorHeader.component";
 import ContentHeader from "../../components/headers/ContentHeader.component";
