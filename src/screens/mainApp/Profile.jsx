@@ -1,7 +1,8 @@
 import auth from '@react-native-firebase/auth';
-import React, { useContext, useState } from "react";
-import { Platform, StyleSheet, Text, TextInput, TouchableOpacity, useWindowDimensions, View } from "react-native";
+import React, { useContext } from "react";
+import { Alert as NativeAlert, Platform, StyleSheet, Text, TouchableOpacity, useWindowDimensions, View } from "react-native";
 import { launchImageLibrary } from "react-native-image-picker";
+import prompt from 'react-native-prompt-android';
 import { useDispatch } from "react-redux";
 import SocialLogin from "../../components/authProviders/organisms/SocialLogin.component";
 import Button from "../../components/buttons/Button2.component";
@@ -10,78 +11,89 @@ import BackHeader from "../../components/headers/BackHeader.component";
 import ContentHeader from "../../components/headers/ContentHeader.component";
 import Container from "../../components/layout/Container2.component";
 import ImageWrapper from "../../components/wrappers/ImageWrapper.component";
+import { errorMessages } from '../../constants/errorCode';
 import { hideLoader, showLoader } from "../../features/loader/loaderSlice";
+import ProfileForm from '../../forms/Profile.form';
 import { UserContext } from "../../navigators/Application";
+import Auth from '../../services/auth/Auth.service';
 import { ProfileService } from "../../services/auth/Profile.service";
 import { colors, layout, typography } from "../../styles/theme.style";
 import { getCredentialsForUser } from "../../utils";
 import Alert from "../../utils/alert";
-import { Alert as NativeAlert } from 'react-native';
-import PasswordResetValidator from "../../validators/auth/PasswordReset.validator";
-import ProfileValidator from "../../validators/auth/Profile.validator";
-
-const LineBreak = () => {
-  return (
-    <View
-      style={{
-        borderBottomColor: colors.general.BACKGROUND,
-        borderBottomWidth: 1,
-        width: '100%',
-      }}
-    />
-  )
-}
+import ChangePasswordForm from '../../forms/ChangePassword.form';
+import LineBreak from '../../components/layout/LineBreak.component';
 
 const Profile = () => {
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const user = useContext(UserContext);
   const { fontScale } = useWindowDimensions();
   const styles = getScaledStyles(fontScale);
   const dispatch = useDispatch();
-  const profileFormInitialValue = { fullName: user.displayName ?? '', email: user.email };
-  const passwordFormInitialValue = { existingPassword: '', password: '', confirmPassword: '' };
-  const profileValidator = ProfileValidator();
-  const passwordValidator = PasswordResetValidator();
-  const profileFields = [
-    {
-      name: "fullName",
-      type: "text",
-      placeholder: "Full Name"
-    },
-    {
-      name: "email",
-      type: "email",
-      placeholder: "Email"
+  const user = useContext(UserContext);
+  const [profileFormInitialValue, profileValidator, profileFields] = ProfileForm(user);
+  const [passwordFormInitialValue, passwordValidator, passwordFields] = ChangePasswordForm();
+  const deleteAccount = async (pass) =>{
+    try{
+      dispatch(showLoader());
+      var existingCredential = getCredentialsForUser(user, pass);
+      try {
+        await user.reauthenticateWithCredential(existingCredential);
+      }
+      catch(error){
+        throw new Error("Incorrect password entered");
+      }
+      await Auth.deleteAccount(user);
+    }catch(error){
+      Alert.notify("An error occured", error.message);
+    }finally{
+      dispatch(hideLoader());
     }
-  ];
-  const passwordFields = [
-    {
-      name: "existingPassword",
-      type: "password",
-      placeholder: "Existing Password",
-      condition: user.providerData.map(provider => provider.providerId).includes("password")
-    },
-    {
-      name: "password",
-      type: "password",
-      placeholder: "New Password",
-    },
-    {
-      name: "confirmPassword",
-      type: "password",
-      placeholder: "Confirm New Password",
+  }
+  const handleForgot = async email => {
+    if (!email) {
+      return;
     }
-  ]
+    try {
+      dispatch(showLoader());
+      await Auth.Reset(email);
+      Alert.notify(
+        errorMessages.passwordResetEmailSent,
+        errorMessages.passwordResetEmailSentMessage
+      );
+      await auth().signOut();
+    } catch (error) {
+      Alert.notify(
+        errorMessages.resetPasswordError,
+        error.code? errorMessages[error.code] ?? error?.message ?? errorMessages.unknownError : errorMessages.unknownError 
+      );
+    }finally{
+      dispatch(hideLoader());
+    }
+  };
   const reAuthenticateToDelete = () =>{
     if (user.providerData.map(provider => provider.providerId).includes("password")) {
-      NativeAlert.prompt("Confirm your identity",'Login Credentials', [{text:"Cancel",isPreferred: true, style:"cancel"},{text:"Confirm", style:"destructive", onPress: (value)=>{
+      if(Platform.OS =="ios"){
+        NativeAlert.prompt("Confirm your identity",'Login Credentials', [{text:"Cancel",isPreferred: true, style:"cancel"},{text:"Confirm", style:"destructive", onPress: (value)=>{
           if(value.login!=user.email){
             NativeAlert.alert("Incorrect Email Address");
           }else{
             deleteAccount(value.password)
           }
         }}], "login-password","","secure-text")
+      }else{
+        prompt(
+          "Confirm your identity",
+          'Please enter your current password.',
+          [
+           {text: 'Cancel',style: 'cancel'},
+           {text: 'OK', onPress: password =>  deleteAccount(password)},
+          ],
+          {
+              type: 'secure-text',
+              cancelable: false,
+              defaultValue: '',
+              placeholder: 'Password'
+          }
+      );
+      }
     }else{
       if(Platform.OS=="ios"){
         NativeAlert.prompt(
@@ -89,44 +101,27 @@ const Profile = () => {
           'Your account was created using a social login. Please enter your email address to reset the password.',
           [
             { text: 'Cancel', style: 'cancel' },
-            { text: 'Confirm', onPress: (value) => resetPassword(value) },
+            { text: 'Confirm', onPress: (email) => handleForgot(email) },
           ],
           'plain-text',
           '',
           'email-address'
         );
       }else{
-        NativeAlert.alert(
-          'Login',
-          '',
+        prompt(
+          'Reset your password',
+          'Your account was created using a social login. Please enter your email address to reset the password.',
           [
-            {
-              text: 'Cancel',
-              style: 'cancel'
-            },
-            {
-              text: 'OK',
-              onPress: () => console.log('OK Pressed')
-            },
+           {text: 'Cancel',style: 'cancel'},
+           {text: 'OK', onPress: email => handleForgot(email)},
           ],
-          { 
-            content: (
-              <View>
-                <TextInput
-                  placeholder="Email"
-                  value={email}
-                  onChangeText={(text) => setEmail(text)}
-                />
-                <TextInput
-                  placeholder="Password"
-                  secureTextEntry={true}
-                  value={password}
-                  onChangeText={(text) => setPassword(text)}
-                />
-              </View>
-            )
+          {
+              type: 'email-address',
+              cancelable: false,
+              defaultValue: '',
+              placeholder: 'Email Address'
           }
-        );
+      );
       }
      
     }
@@ -234,22 +229,22 @@ const Profile = () => {
         </View>
         <View style={{ paddingHorizontal: layout.padding.HORIZONTAL, gap: layout.gap.NEIGHBORS }}>
           <Text style={styles.fullName}>{user.displayName}</Text>
-          <LineBreak />
+          <LineBreak type={"continuous"}/>
           <ContentHeader title={'Basic Info'}>
             <Form handleSubmit={handleProfileUpdate} buttonTitle={"Update Profile"} fields={profileFields} initalValues={profileFormInitialValue} validationSchema={profileValidator} />
           </ContentHeader>
 
           {user.providerData.map(provider => provider.providerId).includes("password") && <>
-            <LineBreak />
+          <LineBreak type={"continuous"}/>
             <ContentHeader title={'Password'}>
               <Form handleSubmit={updatePassword} buttonTitle={"Update Password"} fields={passwordFields} initalValues={passwordFormInitialValue} validationSchema={passwordValidator} />
             </ContentHeader>
           </>}
-          <LineBreak />
+          <LineBreak type={"continuous"}/>
           <ContentHeader title={'Social Logins'}>
             <SocialLogin />
           </ContentHeader>
-          <LineBreak />
+          <LineBreak type={"continuous"}/>
           <Button onPress={confirmDeleteAccount}>Delete Account</Button>
           <Button type="outline" onPress={() => auth()
             .signOut()

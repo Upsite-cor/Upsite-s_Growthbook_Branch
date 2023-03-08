@@ -7,7 +7,7 @@ import emptyCart from '../../assets/images/emptyCart.png';
 import { useDispatch } from "react-redux";
 import firestore from '@react-native-firebase/firestore';
 import { hideLoader, showLoader } from "../../features/loader/loaderSlice";
-import CourseCard from "../../components/home/courseCardv2/CourseCardv2.component";
+import CourseCard from "../../components/cards/atoms/CourseSlimCard.component";
 
 const getTitle = (type, payload) => {
     if (type == "category") {

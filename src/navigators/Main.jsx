@@ -2,7 +2,7 @@ import {createBottomTabNavigator} from '@react-navigation/bottom-tabs';
 import Icon from 'react-native-vector-icons/FontAwesome';
 import Search from '../screens/mainApp/Search';
 import { colors } from '../styles/theme.style';
-import LearnScreen from '../screens/mainApp/LearnScreen';
+import LearnScreen from '../screens/mainApp/Learn';
 import Profile from '../screens/mainApp/Profile';
 import Home from '../screens/mainApp/Home';
 
@@ -11,7 +11,7 @@ const Tab = createBottomTabNavigator();
 const MainNavigation = () => {
   return (
     <Tab.Navigator
-    initialRouteName='Profile'
+    initialRouteName='Search'
     screenOptions={{headerShown: false, tabBarActiveTintColor: colors.general.BRAND, tabBarInactiveTintColor:"#ABABAB"}}>
       <Tab.Screen
         name="Home"

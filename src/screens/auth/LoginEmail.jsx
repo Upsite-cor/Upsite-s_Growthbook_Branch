@@ -11,7 +11,7 @@ import { hideLoader, showLoader } from '../../features/loader/loaderSlice';
 import Auth from '../../services/auth/Auth.service';
 import { layout } from '../../styles/theme.style';
 import Alert from '../../utils/alert';
-import LoginValidator from '../../validators/auth/Login.validator';
+import LoginValidator from '../../forms/validators/auth/Login.validator';
 
 const LoginEmail = ({navigation}) =>{
   const title = "Login to your account.";

@@ -5,4 +5,5 @@ export default class Tables{
     static AUTHOR = "authors";
     static LECTURES = "materials";
     static SYLLABUS = "syllabus";
+    static QUIZ_ATTEMPT = "quizAttempts";
 }

@@ -1,16 +1,25 @@
 import { typography, colors } from "../../styles/theme.style";
 import React from "react";
 import { View, Text, StyleSheet, useWindowDimensions } from "react-native";
-const LineBreak = ({style}) => {
-    const {fontScale} = useWindowDimensions();
-    const styles =  useScaledStyle(fontScale);
+const LineBreak = ({ style, type = "default" }) => {
+    const { fontScale } = useWindowDimensions();
+    const styles = useScaledStyle(fontScale);
     return (
-        <View style={[styles.lineBreakContainer,style]}>
-            <View style={styles.lineSegment} />
-            <Text style={styles.lineText}>
-                OR
-            </Text>
-            <View style={styles.lineSegment} />
+        <View style={[styles.lineBreakContainer, style]}>
+            {type == "default" && <>
+                <View style={styles.lineSegment} />
+                <Text style={styles.lineText}>
+                    OR
+                </Text>
+                <View style={styles.lineSegment} />
+                </>}
+            {type == "continuous" && <View
+                style={{
+                    borderBottomColor: colors.general.BACKGROUND,
+                    borderBottomWidth: 1,
+                    width: '100%',
+                }}
+            />}
         </View>
     );
 };

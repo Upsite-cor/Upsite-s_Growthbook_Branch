@@ -9,7 +9,7 @@ const TabBar = ({ tabs = [], activeIndex, setActiveIndex }) => {
     return (
         <View style={styles.container}>
             {tabs.map((item, index) => (
-                <TouchableOpacity key={index} onPress={()=>{ setActiveIndex(index)}} style={[styles.button, activeIndex == index ? styles.active : {}]}>
+                <TouchableOpacity key={index} onPress={()=>{setActiveIndex? setActiveIndex(index):{}}} style={[styles.button, activeIndex == index ? styles.active : {}]}>
                     <Text style={[styles.text, { color: activeIndex == index ? colors.font.PRIMARY : colors.font.DARK }]}>{item}</Text>
                 </TouchableOpacity>
             ))}

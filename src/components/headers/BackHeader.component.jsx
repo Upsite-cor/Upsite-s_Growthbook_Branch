@@ -1,11 +1,13 @@
 import React from 'react';
 import { View, Text, useWindowDimensions, StyleSheet } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { colors, layout, typography } from '../../styles/theme.style';
 import HeaderButton from '../buttons/HeaderButton.component';
 
 const BackHeader = ({ onPress, text, type = "default", style}) => {
   const {fontScale} = useWindowDimensions();
-  const styles = getScaledStyle(fontScale);
+  const insets = useSafeAreaInsets();
+  const styles = getScaledStyle(fontScale,insets);
   return (
     <View style={[styles.container, style]}>
       {
@@ -18,14 +20,15 @@ const BackHeader = ({ onPress, text, type = "default", style}) => {
   )
 };
 
-const getScaledStyle = fontScale => {
+const getScaledStyle = (fontScale,insets) => {
   return StyleSheet.create({
     container: {
       flexDirection:"row",
       alignItems:"center",
       position:"relative",
       paddingHorizontal: layout.padding.HORIZONTAL/fontScale,
-      paddingVertical: layout.padding.VERTICAL/fontScale
+      paddingVertical: layout.padding.VERTICAL/fontScale,
+      marginTop: 5
     },
     iconContainer:{
       position:"absolute",

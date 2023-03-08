@@ -12,7 +12,7 @@ import { hideLoader, showLoader } from "../../features/loader/loaderSlice";
 import Auth from "../../services/auth/Auth.service";
 import { layout } from "../../styles/theme.style";
 import Alert from "../../utils/alert";
-import ForgotValidator from "../../validators/auth/Forgot.validator";
+import ForgotValidator from "../../forms/validators/auth/Forgot.validator";
 
 const Forgot = ({navigation}) =>{
   const title = "Reset your password.";

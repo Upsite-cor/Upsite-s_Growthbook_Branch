@@ -11,6 +11,15 @@ export default class CourseService {
         });
         return courses;
     }
+    static async getAllCourses() {
+        var courses = [];
+        const collection = await firestore().collection(Tables.COURSES)
+            .get();
+        collection.forEach(documentSnapshot => {
+            courses.push({ ...documentSnapshot.data(), id: documentSnapshot.id });
+        });
+        return courses;
+    }
     static async getCourseById(courseId) {
         var courseSnapshot = await firestore().collection(Tables.COURSES).doc(courseId).get();
         return { ...courseSnapshot.data(), id: courseSnapshot.id };
@@ -63,5 +72,26 @@ export default class CourseService {
     static async getLectureFile(contentId) {
         var lecture = await firestore().collection(Tables.LECTURES).doc(contentId).get();
         return lecture.exists ? { ...lecture.data(), id: lecture.id } : null;
+    }
+    
+    static async getAllProgress(userId){
+        const progress = await firestore()
+        .collection(Tables.PROGRESS).where("userId", "==", userId).get();
+      return progress.docs.map((item) => {
+        return {
+          ...item.data(),
+          id: item.id
+        }
+      });
+    }
+    static async getAllEnrolledCourses(userId){
+        const courses = await firestore()
+        .collection(Tables.COURSES).where("enrollments", "array-contains", userId).get();
+        return courses.docs.map((item) => {
+            return {
+            ...item.data(),
+            id: item.id
+            }
+        });
     }
 }

@@ -11,7 +11,7 @@ import { showLoader } from "../../features/loader/loaderSlice";
 import Auth from "../../services/auth/Auth.service";
 import { layout } from "../../styles/theme.style";
 import Alert from "../../utils/alert";
-import { SignupValidator } from "../../validators/auth/Signup.validator";
+import { SignupValidator } from "../../forms/validators/auth/Signup.validator";
 
 const Signup = ({ navigation }) => {
   const title = "Create new account";
