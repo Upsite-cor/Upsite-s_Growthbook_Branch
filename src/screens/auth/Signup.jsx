@@ -7,7 +7,7 @@ import Form from "../../components/forms/Form.component";
 import AuthHeader from "../../components/headers/AuthHeader.component";
 import Container from "../../components/layout/Container2.component";
 import { errorMessages } from "../../constants/errorCode";
-import { showLoader } from "../../features/loader/loaderSlice";
+import { showLoader } from "../../redux/features/loader/loaderSlice";
 import Auth from "../../services/auth/Auth.service";
 import { layout } from "../../styles/theme.style";
 import Alert from "../../utils/alert";

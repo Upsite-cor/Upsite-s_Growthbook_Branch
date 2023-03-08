@@ -42,7 +42,7 @@ export const QueueInitialTracksService = async syllabus => {
   if (audioLessons.length > 0) {
     const rawAudioBooks = await fetchAudioBooks(mapCourseIds(audioLessons));
     const audioBooks = mapAudioBooks(rawAudioBooks);
-    TrackPlayer.reset();
+    TrackPlayer.removeUpcomingTracks();
     audioBooks.forEach(async item => {
       let lesson = audioLessons.find(x => x.contentId === item.id);
       if (lesson) {

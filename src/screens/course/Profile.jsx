@@ -12,7 +12,7 @@ import ContentHeader from "../../components/headers/ContentHeader.component";
 import Container from "../../components/layout/Container2.component";
 import ImageWrapper from "../../components/wrappers/ImageWrapper.component";
 import { errorMessages } from '../../constants/errorCode';
-import { hideLoader, showLoader } from "../../features/loader/loaderSlice";
+import { hideLoader, showLoader } from "../../redux/features/loader/loaderSlice";
 import ProfileForm from '../../forms/Profile.form';
 import { UserContext } from "../../navigators/Application";
 import Auth from '../../services/auth/Auth.service';

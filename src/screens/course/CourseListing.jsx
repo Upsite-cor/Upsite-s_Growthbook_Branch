@@ -8,7 +8,7 @@ import emptyCart from '../../assets/images/emptyCart.png';
 import CourseSlimCard from "../../components/cards/atoms/CourseSlimCard.component";
 import CourseService from "../../services/courses/Course.service";
 import { useDispatch } from "react-redux";
-import { hideLoader, showLoader } from "../../features/loader/loaderSlice";
+import { hideLoader, showLoader } from "../../redux/features/loader/loaderSlice";
 
 const CourseListing = ({ navigation, route }) => {
     const { payload, type } = route.params;

@@ -6,7 +6,7 @@ import Container from "../../components/layout/Container2.component";
 import { secondsToText } from "../../utils";
 import LazyLoader from '../../components/layout/LazyLoader.component';
 import { useDispatch } from 'react-redux';
-import { hideLoader, showLoader } from '../../features/loader/loaderSlice';
+import { hideLoader, showLoader } from '../../redux/features/loader/loaderSlice';
 import { colors, layout, typography } from '../../styles/theme.style';
 import Button from '../../components/buttons/Button.component';
 import { QuizService } from '../../services/courses/Quiz.service';

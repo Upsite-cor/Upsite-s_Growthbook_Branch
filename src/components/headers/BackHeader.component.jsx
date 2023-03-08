@@ -4,7 +4,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { colors, layout, typography } from '../../styles/theme.style';
 import HeaderButton from '../buttons/HeaderButton.component';
 
-const BackHeader = ({ onPress, text, type = "default", style}) => {
+const BackHeader = ({ onPress, text ="", type = "default", style = null}) => {
   const {fontScale} = useWindowDimensions();
   const insets = useSafeAreaInsets();
   const styles = getScaledStyle(fontScale,insets);
@@ -28,7 +28,7 @@ const getScaledStyle = (fontScale,insets) => {
       position:"relative",
       paddingHorizontal: layout.padding.HORIZONTAL/fontScale,
       paddingVertical: layout.padding.VERTICAL/fontScale,
-      marginTop: 5
+      marginTop: 15,
     },
     iconContainer:{
       position:"absolute",

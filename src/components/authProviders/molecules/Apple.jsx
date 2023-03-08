@@ -8,7 +8,7 @@ import { getProviderButtonTitle } from '../../../utils';
 import SocialLoginProvider from '../atoms/SocialLoginButton';
 import { useSocialAuth } from '../../../hooks/auth/useSocialAuth';
 import { useDispatch } from 'react-redux';
-import { hideLoader, showLoader } from '../../../features/loader/loaderSlice';
+import { hideLoader, showLoader } from '../../../redux/features/loader/loaderSlice';
 import { Constants } from '../../../constants/constants';
 import Alert from '../../../utils/alert';
 

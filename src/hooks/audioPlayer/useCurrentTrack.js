@@ -23,6 +23,8 @@ export const useCurrentTrack = () => {
           .catch(err=>{
             
           })
+        }else{
+          setIndex(0)
         }
       }).catch(error=>{
 

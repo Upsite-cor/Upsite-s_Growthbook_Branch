@@ -5,7 +5,7 @@ import SocialLoginProvider from '../atoms/SocialLoginButton';
 import { errorMessages } from '../../../constants/errorCode';
 import { UserContext } from '../../../navigators/Application';
 import { useDispatch } from 'react-redux';
-import { hideLoader, showLoader } from '../../../features/loader/loaderSlice';
+import { hideLoader, showLoader } from '../../../redux/features/loader/loaderSlice';
 import { useSocialAuth } from '../../../hooks/auth/useSocialAuth';
 import { Constants } from '../../../constants/constants';
 import Alert from '../../../utils/alert';

@@ -12,7 +12,7 @@ import CoursePillHolder from "../../components/pills/molecules/CoursePillHolder.
 import TableOfContent from "../../components/tables/molecules/TableOfContent.component";
 import TabBar from "../../components/tabs/TabBar";
 import WordWrapper from "../../components/wrappers/WordWrapper.component";
-import { hideLoader, showLoader } from "../../features/loader/loaderSlice";
+import { hideLoader, showLoader } from "../../redux/features/loader/loaderSlice";
 import { UserContext } from "../../navigators/Application";
 import AuthorService from "../../services/courses/Author.service";
 import CourseService from "../../services/courses/Course.service";

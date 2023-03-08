@@ -6,7 +6,7 @@ import { errorMessages } from '../../../constants/errorCode';
 import { UserContext } from '../../../navigators/Application';
 import { useSocialAuth } from '../../../hooks/auth/useSocialAuth';
 import { useDispatch } from 'react-redux';
-import { hideLoader, showLoader } from '../../../features/loader/loaderSlice';
+import { hideLoader, showLoader } from '../../../redux/features/loader/loaderSlice';
 import Alert from '../../../utils/alert';
 import { Constants } from '../../../constants/constants';
 

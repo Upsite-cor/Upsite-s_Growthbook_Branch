@@ -1,10 +1,10 @@
 import {createBottomTabNavigator} from '@react-navigation/bottom-tabs';
 import Icon from 'react-native-vector-icons/FontAwesome';
-import Search from '../screens/mainApp/Search';
+import Search from '../screens/course/Search';
 import { colors } from '../styles/theme.style';
-import LearnScreen from '../screens/mainApp/Learn';
-import Profile from '../screens/mainApp/Profile';
-import Home from '../screens/mainApp/Home';
+import LearnScreen from '../screens/course/Learn';
+import Profile from '../screens/course/Profile';
+import Home from '../screens/course/Home';
 
 const Tab = createBottomTabNavigator();
 
