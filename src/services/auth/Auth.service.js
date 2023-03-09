@@ -7,7 +7,6 @@ export default class Auth {
             return await auth()
             .signInWithEmailAndPassword(email, password);
         }catch(error){
-            console.log(error, "firsg");
             throw error;
         }
     }

@@ -155,8 +155,10 @@ const Profile = () => {
     launchImageLibrary(options, (response) => {
       if (response.didCancel) {
         console.log('User cancelled image picker');
+        return;
       } else if (response.error) {
         console.log('ImagePicker Error: ', response.error);
+        return;
       } else {
         // setImageURI(response.uri);
         // call the uploadProfilePicture function to upload the image to Firebase Storage and update the user's profile
