@@ -36,7 +36,6 @@ const QuizAttempt = ({ route, navigation }) => {
   const { fontScale } = useWindowDimensions();
   const globalDispatch = useDispatch();
   const styles = getScaledStyles(fontScale);
-  console.log(styles.optionText);
   const [state, dispatch] = useReducer(reducer, initalState);
 
   if (payload?.quiz?.questions?.length == 0) {

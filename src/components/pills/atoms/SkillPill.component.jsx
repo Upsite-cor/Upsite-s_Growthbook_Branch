@@ -6,7 +6,7 @@ const SkillPill = ({skill, clickHandler}) => {
     const {fontScale} = useWindowDimensions();
     const styles = getScaledStyles(fontScale);
     return (
-      <TouchableOpacity onPress={()=>{clickHandler(skill)}}>
+      <TouchableOpacity onPress={()=>{clickHandler? clickHandler(skill):{}}}>
         <View style={styles.pill} onPress>
         <Text style={styles.learningText}>{skill}</Text>
       </View>
