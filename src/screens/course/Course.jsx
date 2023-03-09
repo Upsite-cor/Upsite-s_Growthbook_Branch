@@ -169,7 +169,7 @@ const Course = ({ route, navigation }) => {
             View Progress
           </Button>
         )}
-        {!state.course?.enrollments.includes(user.uid) && (
+        {!state.course?.enrollments.includes(user.uid) && (state.syllabus && state?.syllabus?.syllabus?.length>0) && (
           <Button
             onPress={() => enrollIntoCourse()}>Enroll</Button>
         )}

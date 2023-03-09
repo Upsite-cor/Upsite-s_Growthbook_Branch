@@ -15,19 +15,8 @@ const AudioPlayer = () => {
   const { fontScale } = useWindowDimensions();
   const styles = getScaledStyles(fontScale);
   const [track, setTrack] = useState();
+  const [index, setIndex] = useState();
   const state = usePlaybackState();
-
-  // useTrackPlayerEvents([Event.PlaybackTrackChanged], async (event) => {
-  //   console.log("Changeddd");
-  //     var index = event.nextTrack;
-  //     if (index === undefined){
-  //       index = 0;
-  //     };
-  //     (async () => {
-  //       const track = await TrackPlayer.getTrack(index);
-  //       setTrack(track || undefined);
-  //     })();
-  //  });
 
   const dispatch = useDispatch();
   const progress = useProgress();
@@ -40,22 +29,40 @@ const AudioPlayer = () => {
   const onTogglePlayback = useOnTogglePlayback();
 
   useEffect(() => {
+    const updateTrack = async () => {
+      const trackId = await TrackPlayer.getCurrentTrack();
+      const track = await TrackPlayer.getTrack(trackId ?? 0);
+      setTrack(track);
+      setIndex(trackId ?? 0);
+    };
+
+    const listener = TrackPlayer.addEventListener(
+      'playback-track-changed',
+      updateTrack,
+    );
+
+    updateTrack();
+
+    return () => listener.remove();
+  }, []);
+
+  const skipToPrevious = async () => {
+    if(index==0){
+      var queue = await TrackPlayer.getQueue();
+      TrackPlayer.skip(queue.length-1 ,-1);
+    }else{
+      TrackPlayer.skipToPrevious();
+    }
+  }
+
+  useEffect(() => {
     if (state == State.Connecting) {
       dispatch(showLoader());
     } else {
       dispatch(hideLoader());
     }
   }, [state]);
-  useEffect(()=>{
-    (async () => {
-      var index = await TrackPlayer.getCurrentTrack();
-      console.log(index??0);
-      console.log(await TrackPlayer.getQueue());
-    const track = await TrackPlayer.getTrack(index?? 0);
-    console.log(track);
-    setTrack(track);
-    })();
-  },[]);
+
   return (
     <View style={{ flex: 1, paddingHorizontal: layout.padding.HORIZONTAL, paddingVertical: layout.padding.VERTICAL, gap: layout.gap.NEIGHBORS }}>
       <View style={{ alignItems: "center" }}>
@@ -90,7 +97,7 @@ const AudioPlayer = () => {
       <View style={styles.row}>
         <PlayerButton
           type="back"
-          onPress={() => TrackPlayer.skipToPrevious()}
+          onPress={skipToPrevious}
         />
         {
           isLoading && <ActivityIndicator />

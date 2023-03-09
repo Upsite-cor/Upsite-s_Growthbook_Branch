@@ -42,7 +42,7 @@ export const QueueInitialTracksService = async syllabus => {
   if (audioLessons.length > 0) {
     const rawAudioBooks = await fetchAudioBooks(mapCourseIds(audioLessons));
     const audioBooks = mapAudioBooks(rawAudioBooks);
-    TrackPlayer.removeUpcomingTracks();
+    TrackPlayer.reset();
     audioBooks.forEach(async item => {
       let lesson = audioLessons.find(x => x.contentId === item.id);
       if (lesson) {
@@ -56,6 +56,7 @@ export const QueueInitialTracksService = async syllabus => {
           isCompleted: lesson.isCompleted,
           contentId: lesson.contentId,
           artwork: item.coverArt,
+          courseId: syllabus.courseId,
         });
       }
     });
