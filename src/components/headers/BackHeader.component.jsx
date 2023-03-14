@@ -28,7 +28,7 @@ const getScaledStyle = (fontScale,insets) => {
       position:"relative",
       paddingHorizontal: layout.padding.HORIZONTAL/fontScale,
       paddingVertical: layout.padding.VERTICAL/fontScale,
-      marginTop: 15,
+      marginTop: layout.margin.HORIZONTAL,
     },
     iconContainer:{
       position:"absolute",

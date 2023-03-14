@@ -1,7 +1,7 @@
 import React from "react";
 import { View, Image, Text, StyleSheet, useWindowDimensions } from "react-native";
 import Logo from '../../assets/images/growthbookLogo-2.png';
-import { colors, typography } from "../../styles/theme.style";
+import { colors, layout, typography } from "../../styles/theme.style";
 
 const AuthHeader = ({ title }) => {
     const { fontScale } = useWindowDimensions();
@@ -21,15 +21,15 @@ export const getScaledStyles = (fontScale) => {
         container: {
             display: "flex",
             alignItems: "center",
-            gap: 45,
+            gap: layout.gap.VERTICAL,
         },
         logoContainer: {
             alignItems: "center",
-            marginTop: 15
+            marginTop: layout.margin.HORIZONTAL
         },
         logo: {
-            maxWidth: 200,
-            height: 45,
+            maxWidth: 200/fontScale,
+            height: 45/fontScale,
         },
         text: {
             fontFamily: typography.fontFamilies.PRIMARY,

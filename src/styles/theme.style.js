@@ -27,11 +27,13 @@ export const layout = {
     gap: {
         NEIGHBORS : 10,
         INTERNAL: 5,
+        VERTICAL:45,
     },
     margin:{
         VERTICAL:50,
         NEIGHBORS: 15,
-        INERNAL:5
+        INERNAL:5,
+        HORIZONTAL:5,
     },
     padding:{
         HORIZONTAL:16,

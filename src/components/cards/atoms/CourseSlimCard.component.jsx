@@ -15,7 +15,7 @@ const CourseSlimCard = ({ course, clickHandler }) => {
                  errorImageStyle={styles.image} 
                  spinnerStyle={styles.activityLoader}
                 style={styles.imageContainer} imageStyle={styles.image} />
-                <View style={{gap: layout.gap.INTERNAL, paddingVertical: layout.padding.VERTICAL}}>
+                <View style={{flex:1,gap: layout.gap.INTERNAL, paddingVertical: layout.padding.VERTICAL}}>
                     <Text style={styles.title}>{course.title}</Text>
                     <Text style={styles.authorName}>{course.author?.name}</Text>
                 </View>
@@ -29,6 +29,7 @@ const getScaledStyles = fontScale =>{
         imageContainer:{
             height:80,
             width:80,
+            flex:0,
             alignItems: "center",
             justifyContent: "center"
         },
