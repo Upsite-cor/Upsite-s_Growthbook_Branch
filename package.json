@@ -1,13 +1,15 @@
 {
   "name": "Growthbook",
-  "version": "0.0.1",
+  "version": "1.1.0",
   "private": true,
   "scripts": {
     "android": "react-native run-android",
     "ios": "react-native run-ios",
     "lint": "eslint .",
     "start": "react-native start",
-    "test": "jest"
+    "test": "jest",
+    "postversion": "react-native-version --never-amend",
+    "updateVersion":"yarn version --no-git-tag-version"
   },
   "dependencies": {
     "@invertase/react-native-apple-authentication": "^2.2.2",
@@ -58,6 +60,7 @@
     "jest": "^29.4.3",
     "metro-react-native-babel-preset": "0.75.0",
     "prettier": "^2.8.4",
+    "react-native-version": "^4.0.0",
     "react-test-renderer": "18.2.0",
     "typescript": "4.9.5"
   },

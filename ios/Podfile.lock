@@ -1,4 +1,4 @@
-PODS:
+    PODS:
   - abseil/algorithm (1.20211102.0):
     - abseil/algorithm/algorithm (= 1.20211102.0)
     - abseil/algorithm/container (= 1.20211102.0)
@@ -1477,4 +1477,4 @@ SPEC CHECKSUMS:
 
 PODFILE CHECKSUM: 470c7d573903d105a79885bbcf4b38856ecacc9b
 
-COCOAPODS: 1.11.3
+COCOAPODS: 1.12.0
