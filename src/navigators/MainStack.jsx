@@ -1,12 +1,12 @@
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
-import AudioApp from '../screens/player/AudioApp';
-import CourseDetailv2 from '../screens/mainApp/courseDetail/CourseDetailv2';
-import CourseNavigation from '../screens/mainApp/CourseNavigation';
+import AudioApp from '../screens/player/PodcastPlayer';
+import CourseDetailv2 from '../screens/course/Course';
+import CourseNavigation from '../screens/course/CourseNavigation';
 import MainNavigation from './Main';
-import LectureViewer from '../screens/mainApp/LectureViewer';
+import LectureViewer from '../screens/course/LectureViewer';
 import QuizInfo from '../screens/quiz/QuizInfo';
 import QuizAttempt from '../screens/quiz/QuizAttempt';
-import CourseListing from '../screens/mainApp/CourseListing';
+import CourseListing from '../screens/course/CourseListing';
 
 const Stack = createNativeStackNavigator();
 

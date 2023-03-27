@@ -1,8 +1,7 @@
 import React from 'react';
 import {ScrollView, SafeAreaView as NativeSafeAreaView} from 'react-native';
 import {SafeAreaProvider, SafeAreaView} from 'react-native-safe-area-context';
-import ContainerStylesheet from './Container.component.style';
-
+import { StyleSheet } from 'react-native';
 
 const Container = ({children, useDefaultSafeArea = true, edges= ["top", "bottom"], isScrollable = true, addPadding= true}) => {
 
@@ -42,3 +41,10 @@ const Container = ({children, useDefaultSafeArea = true, edges= ["top", "bottom"
 
 
 export default Container;
+
+const ContainerStylesheet = StyleSheet.create({
+    container:{
+        paddingHorizontal:16,
+    }
+});
+

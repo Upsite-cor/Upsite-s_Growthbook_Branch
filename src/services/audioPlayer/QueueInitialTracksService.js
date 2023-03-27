@@ -56,6 +56,7 @@ export const QueueInitialTracksService = async syllabus => {
           isCompleted: lesson.isCompleted,
           contentId: lesson.contentId,
           artwork: item.coverArt,
+          courseId: syllabus.courseId,
         });
       }
     });

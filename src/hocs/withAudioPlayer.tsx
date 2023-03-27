@@ -1,7 +1,7 @@
 import React, { useEffect } from 'react'
 import { useDispatch, useSelector } from 'react-redux';
 import ErrorAudioPlayer from '../components/audioPlayer/organisms/ErrorAudioPlayer';
-import { playerNotReady, playerReady } from '../features/audioPlayer/audioPlayerSlice';
+import { playerNotReady, playerReady } from '../redux/features/audioPlayer/audioPlayerSlice';
 import { SetupService } from '../services/audioPlayer';
 
 const withAudioPlayer = (Component: any) => (props: any) =>{

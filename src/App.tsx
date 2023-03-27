@@ -8,7 +8,7 @@
 import React, {} from 'react';
 import {SafeAreaProvider} from 'react-native-safe-area-context';
 import {Provider} from 'react-redux';
-import {store} from './app/store';
+import {store} from './redux/stores/store';
 import ApplicationNavigator from './navigators/Application';
 
 const App = () => {

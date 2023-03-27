@@ -3,7 +3,7 @@ import {DefaultTheme, NavigationContainer} from '@react-navigation/native';
 import React, {createContext, useEffect, useState} from 'react';
 import {ActivityIndicator, View} from 'react-native';
 import { useDispatch, useSelector } from 'react-redux';
-import { updateUserId } from '../features/auth/authSlice';
+import { updateUserId } from '../redux/features/auth/authSlice';
 import {colors} from '../styles/theme.style';
 import MainStack from './MainStack';
 import SignedOutStack from './SignedOutStack';

@@ -28,10 +28,10 @@ const types = {
   },
 };
 
-export const PlayerButton = ({type, onPress}) => {
+export const PlayerButton = ({type, onPress ,style = null}) => {
   const button = types[type];
   return (
-    <TouchableOpacity onPress={onPress}>
+    <TouchableOpacity style={style} onPress={onPress}>
       <Icon
         name={button.icon.name}
         color={button.icon.color}
