@@ -79,5 +79,5 @@ Descriptive Steps for Newbies:
     Retry and Contact for Assistance:
         Retry yarn ios and it should start to work. 
 
-If issues persist, feel free to contact bcortes13@csudh.edu for assistance.
+If issues persist, feel free to contact upsite10@yahoo.com for assistance.
 
