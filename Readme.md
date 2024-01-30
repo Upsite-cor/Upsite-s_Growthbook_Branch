@@ -118,4 +118,4 @@ Navigate to the android directory and open the build.gradle file. Ensure that th
 
 <h2>Step 4: Run the Project</h2>
 
-Attempt to run your project again. If you encounter any issues, please contact me at upsite10@yahoo.com for assistance.
+Attempt to run your project again. If you encounter any issues, please contact me at bcortes13@csudh.edu for assistance.
