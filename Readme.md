@@ -1,4 +1,6 @@
-<h1>Growth-Book Configuration Guide for Mac M1 and iOS. <br>Developer's guide only</h1>
+<h1>Growth-Book Configuration Guide for Mac M1 and iOS. <br>
+IOS Developer's guide only<br> 
+Updated: 1/24/2024</h1>
 
 Welcome, Programmers!
 
@@ -63,9 +65,11 @@ Descriptive Steps for Newbies:
     Open Pod Xcode File:
         Open the pod Xcode file at Growthbook-Mobile -> ios -> Pods -> Pods.xcodeproj.
 ![Alt text](readmeimgs/Pods_location.png)
+
     Configure React-Codegen:
         Scroll down and click on React-Codegen. Under Minimum Deployments, ensure iOS version is set to 12.4. If not, update it. Reference: React Native Issue #34106. https://github.com/facebook/react-native/issues/34106
-![Alt text](image-1.png)
+
+![Alt text](readmeimgs/react-codegen-pods-view.png)
     
     Retry Yarn iOS:
         Retry yarn ios. If issues persist, follow these steps.
@@ -81,3 +85,37 @@ Descriptive Steps for Newbies:
 
 If issues persist, feel free to contact bcortes13@csudh.edu for assistance.
 
+
+
+
+<h1>
+Configuring Growthbook for Mac M1 - Readme
+For Android Developers Guide<br>
+Updated: 1/25/2024
+</h1>
+
+<h2>Step 1: Set Up React Native Environment</h2>
+
+Follow the React Native documentation for environment setup by visiting this [forum](https://reactnative.dev/docs/environment-setup). Ensure that you choose macOS as the Development OS and Target OS for Android.
+
+Verify your setup by creating a new project named AwesomeProject using the default React template. If successful, you should see the error below and proceed to the next step. If you encounter any errors, resolve them before moving on until you see the error below.
+![Alt text](readmeimgs/ErrorAndroidDev.png)
+
+
+<h2>Step 2: Update build.gradle</h2>
+
+Navigate to the android directory and open the build.gradle file. Ensure that the source code below matches the content inside your own build.gradle. Copy the provided source code exactly into your build.gradle.
+![Alt text](readmeimgs/BuildGradleAndroid.png)
+
+
+<h2>Step 3: create and modify local.properties</h2>
+    After this step create a file that is labled as local.properties in the android directory. 
+    Then inside local.properties add this line of text
+    [sdk.dir = /Users/USERNAME/Library/Android/sdk]
+<h2>Step 4: make sure your zprofile looks like this: </h2>
+![image](https://github.com/Upsite-cor/READ_ME_Growthbook_config/assets/76449648/4e3312b8-6fec-4765-9013-2f2aca534416)
+
+
+<h2>Step 4: Run the Project</h2>
+
+Attempt to run your project again. If you encounter any issues, please contact me at bcortes13@csudh.edu for assistance.
